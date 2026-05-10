@@ -17,13 +17,6 @@ describe("Home page", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders knowledge action buttons", () => {
-    render(<Home />);
-    expect(
-      screen.getByRole("button", { name: /RAG 索引/i }),
-    ).toBeInTheDocument();
-  });
-
   it("renders RAG chat section", () => {
     render(<Home />);
     expect(
@@ -34,5 +27,17 @@ describe("Home page", () => {
   it("shows empty graph placeholder", () => {
     render(<Home />);
     expect(screen.getByText("暂无知识图谱")).toBeInTheDocument();
+  });
+
+  it("shows empty file list", () => {
+    render(<Home />);
+    expect(screen.getByText("暂无教材")).toBeInTheDocument();
+  });
+
+  it("has three-panel layout structure", () => {
+    const { container } = render(<Home />);
+    // Two aside panels (left: files, right: RAG) + 1 section (graph)
+    expect(container.querySelectorAll("aside")).toHaveLength(2);
+    expect(container.querySelectorAll("section")).toHaveLength(1);
   });
 });

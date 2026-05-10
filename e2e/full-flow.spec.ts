@@ -75,7 +75,7 @@ test.describe("Full upload flow", () => {
       });
 
     expect(realErrors).toHaveLength(0);
-    await visualPause(page);
+    await page.pause(); // keep browser open — inspect the graph result
   });
 
   test("upload .pdf → parse and show in file list", async ({ page }) => {

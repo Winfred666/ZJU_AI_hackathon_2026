@@ -32,6 +32,7 @@ export function FileList({ textbooks, selectedId, onSelect }: {
           <div key={tb.textbookId} className="group relative">
             <button
               onClick={() => onSelect(tb.textbookId)}
+              title={tb.status === "error" ? tb.errorMessage ?? tb.statusDetail : undefined}
               className={cn(
                 "flex w-full items-center gap-2 rounded-md p-2 text-left text-sm transition-colors",
                 selectedId === tb.textbookId
