@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 export const KnowledgeGraphDynamic = dynamic(
   () =>
     import("./knowledge-graph").then((mod) => ({
-      default: mod.KnowledgeGraph,
+      default: mod.KnowledgeGraphView,
     })),
   {
     ssr: false,

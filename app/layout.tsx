@@ -13,21 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZJU AI Hackathon 2026 - Big Health",
-  description: "5 hours fullstack AI developing, topic on Big Health",
+  title: "学科知识整合智能体",
+  description: "ZJU AI Hackathon 2026 — 医学教材知识图谱与智能问答",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="h-dvh overflow-hidden bg-background text-foreground antialiased">{children}</body>
     </html>
   );
 }

@@ -20,6 +20,8 @@ Enforces an opinionated UI baseline to prevent AI-generated interface slop.
 
 ## Stack
 
+- MUST use `shadcn/ui` components for standard interface elements
+- MUST use `AntV/G6` for node-link visualizations and knowledge graphs
 - MUST use Tailwind CSS defaults (spacing, radius, shadows) before custom values
 - MUST use `motion/react` (formerly `framer-motion`) when JavaScript animation is required
 - SHOULD use `tw-animate-css` for entrance and micro-animations in Tailwind CSS
@@ -27,14 +29,37 @@ Enforces an opinionated UI baseline to prevent AI-generated interface slop.
 
 ## Components
 
+- MUST use the project’s existing `shadcn/ui` components (found in `components/ui`) first
 - MUST use accessible component primitives for anything with keyboard or focus behavior (`Radix`)
-- MUST use the project’s existing component primitives first
 - NEVER mix primitive systems within the same interaction surface
 - MUST add an `aria-label` to icon-only buttons
 - NEVER rebuild keyboard or focus behavior by hand unless explicitly requested
 - MUST use `isLoading` prop on the `Button` component when indicating loading state
 - NEVER use `ml-x` or `mr-x` when styling an icon inside a button, since spacing will be given to it automatically
 - NEVER explicitly set border color to `border-border` since this is the default border color
+
+## Medical Science Design System
+
+- MUST use a "Formal Medical" palette:
+    - Primary/Nodes: Deep Blue (e.g., `blue-800`, `blue-900`)
+    - Accents: Medical Blue (e.g., `blue-600`)
+    - Backgrounds/Hover: Very Light Blue (e.g., `blue-50`)
+- NEVER use warm colors (red/orange/yellow) except for critical error states
+- MUST maintain a "Clean Paper" aesthetic (off-white backgrounds, subtle borders)
+
+## Knowledge Graph (AntV/G6)
+
+- MUST follow the "Connected Papers" aesthetic: shallow/paper background with deep blue nodes
+- MUST use standard G6 layout algorithms (e.g., `force`, `dagre`) for consistency
+- MUST ensure nodes are colored in Deep Blue (`#1e3a8a` or Tailwind `blue-900`)
+- SHOULD use smooth layout transitions and standard G6 animation behaviors
+
+## PDF & File Management
+
+- MUST implement a "NotebookLM" style drag-and-list management system
+- MUST use light blue hover states (`bg-blue-50`) for file list items
+- MUST provide a clear "empty state" that encourages PDF uploads
+- SHOULD use structural skeletons when parsing or indexing uploaded PDFs
 
 ## Interaction
 

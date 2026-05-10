@@ -10,26 +10,32 @@ describe("Home page", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the three-panel layout", () => {
+  it("renders the upload zone", () => {
     render(<Home />);
     expect(
-      screen.getByRole("heading", { name: /教材管理/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /功能面板/i }),
+      screen.getByRole("button", { name: /点击上传/i }),
     ).toBeInTheDocument();
   });
 
-  it("renders action buttons", () => {
+  it("renders knowledge action buttons", () => {
     render(<Home />);
     expect(
       screen.getByRole("button", { name: /提取知识/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /构建图谱/i }),
-    ).toBeInTheDocument();
-    expect(
       screen.getByRole("button", { name: /建立索引/i }),
     ).toBeInTheDocument();
+  });
+
+  it("renders RAG chat section", () => {
+    render(<Home />);
+    expect(
+      screen.getByRole("heading", { name: /RAG 问答/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows empty graph placeholder", () => {
+    render(<Home />);
+    expect(screen.getByText("暂无知识图谱")).toBeInTheDocument();
   });
 });
