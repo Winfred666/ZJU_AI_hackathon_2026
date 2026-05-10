@@ -22,8 +22,13 @@ export interface ParseResult {
   tocPageRange: { start: number; end: number } | null;
 }
 
+/** How much of the PDF was parsed */
+export type ParseStatus = "full" | "partial" | "toc_only" | "error";
+
 export interface Textbook extends ParseResult {
-  status: "parsing" | "ready" | "error";
+  status: ParseStatus;
+  /** Human-readable detail (e.g. "已解析 20/200 页") */
+  statusDetail?: string;
   errorMessage?: string;
   uploadedAt: number;
 }

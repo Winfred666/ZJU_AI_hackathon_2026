@@ -8,7 +8,8 @@ const sampleTextbooks: Textbook[] = [
     textbookId: "tb1",
     filename: "生理学.pdf",
     title: "生理学",
-    status: "ready",
+    status: "full",
+    statusDetail: "全文解析完成 (45KB)",
     totalPages: 300,
     totalChars: 450000,
     chapters: [],
@@ -20,7 +21,8 @@ const sampleTextbooks: Textbook[] = [
     textbookId: "tb2",
     filename: "免疫学.txt",
     title: "医学免疫学",
-    status: "parsing",
+    status: "partial",
+    statusDetail: "已解析前 20/200 页",
     totalPages: 200,
     totalChars: 300000,
     chapters: [],
@@ -34,6 +36,7 @@ const sampleTextbooks: Textbook[] = [
     title: "病理学",
     status: "error",
     errorMessage: "解析失败",
+    statusDetail: "解析失败",
     totalPages: 0,
     totalChars: 0,
     chapters: [],
@@ -58,18 +61,17 @@ describe("FileList", () => {
     expect(screen.getByText("病理学")).toBeInTheDocument();
   });
 
-  it("shows file info with char count", () => {
+  it("shows status detail text", () => {
     render(
       <FileList textbooks={sampleTextbooks} selectedId={null} onSelect={vi.fn()} />,
     );
-    expect(screen.getByText(/450k字/)).toBeInTheDocument();
+    expect(screen.getByText(/45KB/)).toBeInTheDocument();
   });
 
   it("highlights selected textbook", () => {
     const { container } = render(
       <FileList textbooks={sampleTextbooks} selectedId="tb1" onSelect={vi.fn()} />,
     );
-    // The selected button should have the ring class
     const selected = container.querySelector(".ring-1");
     expect(selected).toBeTruthy();
   });

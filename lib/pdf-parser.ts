@@ -53,8 +53,14 @@ export function extractChapters(fullText: string, textbookId: string): Chapter[]
 
 /**
  * Extract the table-of-contents from a PDF's full text.
- * Scans first ~25% of pages for TOC start/end markers.
- * Returns the TOC text and page range, or null if not found.
+ *
+ * Logic:
+ *  1. Estimate lines-per-page from totalPages.
+ *  2. Search only the first 25% of the document (TOC always in front matter).
+ *  3. Look for a TOC_START marker (目录 / 目次 / Contents).
+ *  4. Once found, look for a TOC_END marker (first chapter heading / 前言 / 绪论 / 引言).
+ *  5. If no end marker, assume TOC spans ~4 pages from start.
+ *  6. Return the extracted text and the page range.
  */
 export function extractTOC(fullText: string, totalPages: number): {
   tocText: string;
@@ -62,7 +68,6 @@ export function extractTOC(fullText: string, totalPages: number): {
 } {
   const lines = fullText.split("\n");
   const linesPerPage = Math.max(1, Math.floor(lines.length / totalPages));
-  // Only search first 25% of document for TOC
   const searchLines = Math.floor(lines.length * 0.25);
 
   let tocStartLine = -1;
@@ -87,7 +92,6 @@ export function extractTOC(fullText: string, totalPages: number): {
   }
 
   if (tocEndLine === -1) {
-    // Fallback: TOC is typically 2-5 pages
     tocEndLine = tocStartLine + linesPerPage * 4;
   }
 
@@ -100,6 +104,21 @@ export function extractTOC(fullText: string, totalPages: number): {
       end: Math.ceil(tocEndLine / linesPerPage),
     },
   };
+}
+
+/**
+ * Extract only the first N pages of text.
+ * Used as fallback when TOC extraction fails on large files.
+ */
+export function extractFirstNPages(
+  fullText: string,
+  totalPages: number,
+  n: number,
+): string {
+  const lines = fullText.split("\n");
+  const linesPerPage = Math.max(1, Math.floor(lines.length / totalPages));
+  const endLine = Math.min(n * linesPerPage, lines.length);
+  return lines.slice(0, endLine).join("\n").trim();
 }
 
 /**

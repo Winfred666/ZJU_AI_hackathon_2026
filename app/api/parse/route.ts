@@ -6,13 +6,15 @@ import {
   estimatePages,
   extractChapters,
   extractTOC,
+  extractFirstNPages,
 } from "@/lib/pdf-parser";
 import { extractTOCGraph } from "@/lib/toc-llm";
 
 export const textbookStore = new Map<string, Textbook>();
 export const tocGraphStore = new Map<string, TOCGraph>();
 
-const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB hard limit for upload
+const TINY_FILE_BYTES = 50_000; // 50KB: send whole file to LLM
+const FALLBACK_PAGES = 20; // when TOC fails, parse only first 20 pages
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
@@ -31,11 +33,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const filename = file.name;
       const ext = filename.split(".").pop()?.toLowerCase();
 
-      if (file.size > MAX_FILE_BYTES) {
-        results.push(makeError(textbookId, filename, `文件过大 (最大50MB)`));
-        continue;
-      }
-
       if (!ext || !["pdf", "txt", "md"].includes(ext)) {
         results.push(makeError(textbookId, filename, `不支持的文件格式: .${ext}`));
         continue;
@@ -45,50 +42,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const buffer = Buffer.from(arrayBuffer);
 
       if (ext === "pdf") {
-        try {
-          const { PDFParse } = await import("pdf-parse");
-          const parser = new PDFParse({ data: buffer });
-          const textResult = await parser.getText();
-          const fullText = textResult.text as string;
-          const totalPages = textResult.total;
-          const title = getTextbookTitle(filename);
-          const chapters = extractChapters(fullText, textbookId);
-          const { tocText, pageRange } = extractTOC(fullText, totalPages);
-
-          const textbook: Textbook = {
-            textbookId, filename, title,
-            totalPages, totalChars: fullText.length,
-            chapters, tocText, tocPageRange: pageRange,
-            status: "ready", uploadedAt: Date.now(),
-          };
-
-          results.push(textbook);
-          textbookStore.set(textbookId, textbook);
-
-          // Auto-extract TOC graph if TOC found
-          if (tocText) {
-            const chapterPageMap = chapters.map((c) => ({
-              title: c.title,
-              pageStart: c.pageStart,
-              pageEnd: c.pageEnd,
-            }));
-            const tGraph = await extractTOCGraph(tocText, textbookId, chapterPageMap);
-            if (tGraph) {
-              tocGraphStore.set(textbookId, tGraph);
-              tocGraphs[textbookId] = tGraph;
-            } else {
-              tocGraphs[textbookId] = null;
-            }
-          } else {
-            tocGraphs[textbookId] = null;
-          }
-        } catch (err) {
-          results.push(makeError(textbookId, filename, `PDF 解析失败: ${String(err)}`));
+        const result = await handlePdf(buffer, file, textbookId, filename);
+        results.push(result.textbook);
+        if (result.tocGraph !== undefined) {
+          tocGraphs[textbookId] = result.tocGraph;
         }
         continue;
       }
 
-      // TXT / MD: parse as text, no TOC auto-detection (no page concept)
+      // TXT / MD: always parse fully (no page concept, no TOC seek)
       const rawText = new TextDecoder("utf-8").decode(buffer);
       const { chapters, fullText } = parseTxtContent(rawText, textbookId);
 
@@ -96,7 +58,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         textbookId, filename, title: getTextbookTitle(filename),
         totalPages: estimatePages(fullText), totalChars: fullText.length,
         chapters, tocText: "", tocPageRange: null,
-        status: "ready", uploadedAt: Date.now(),
+        status: "full", statusDetail: "全文解析完成",
+        uploadedAt: Date.now(),
       };
 
       results.push(textbook);
@@ -110,10 +73,93 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 }
 
+async function handlePdf(
+  buffer: Buffer,
+  file: File,
+  textbookId: string,
+  filename: string,
+): Promise<{ textbook: Textbook; tocGraph?: TOCGraph | null }> {
+  const fileBytes = file.size;
+  const title = getTextbookTitle(filename);
+
+  try {
+    const { PDFParse } = await import("pdf-parse");
+    const parser = new PDFParse({ data: buffer });
+    const textResult = await parser.getText();
+    const fullText = textResult.text as string;
+    const totalPages = textResult.total;
+
+    // ── Tiny file (< 50KB): parse fully, send whole text to LLM ──
+    if (fileBytes < TINY_FILE_BYTES) {
+      const chapters = extractChapters(fullText, textbookId);
+      const textbook: Textbook = {
+        textbookId, filename, title, totalPages, totalChars: fullText.length,
+        chapters, tocText: "", tocPageRange: null,
+        status: "full", statusDetail: `全文解析完成 (${(fileBytes / 1024).toFixed(0)}KB)`,
+        uploadedAt: Date.now(),
+      };
+      textbookStore.set(textbookId, textbook);
+
+      const chapterPageMap = chapters.map((c) => ({
+        title: c.title, pageStart: c.pageStart, pageEnd: c.pageEnd,
+      }));
+      const tGraph = await extractTOCGraph(fullText.slice(0, 30_000), textbookId, chapterPageMap);
+      if (tGraph) tocGraphStore.set(textbookId, tGraph);
+      return { textbook, tocGraph: tGraph };
+    }
+
+    // ── Large file: try TOC extraction first ──
+    const { tocText, pageRange } = extractTOC(fullText, totalPages);
+
+    if (tocText) {
+      // TOC found: parse only TOC pages for graph, store chapter structure
+      const chapters = extractChapters(fullText, textbookId);
+      const textbook: Textbook = {
+        textbookId, filename, title, totalPages, totalChars: fullText.length,
+        chapters, tocText, tocPageRange: pageRange,
+        status: "toc_only",
+        statusDetail: `目录已解析 · 共${totalPages}页`,
+        uploadedAt: Date.now(),
+      };
+      textbookStore.set(textbookId, textbook);
+
+      const chapterPageMap = chapters.map((c) => ({
+        title: c.title, pageStart: c.pageStart, pageEnd: c.pageEnd,
+      }));
+      const tGraph = await extractTOCGraph(tocText, textbookId, chapterPageMap);
+      if (tGraph) tocGraphStore.set(textbookId, tGraph);
+      return { textbook, tocGraph: tGraph };
+    }
+
+    // ── TOC not found: fallback to first 20 pages ──
+    const firstNText = extractFirstNPages(fullText, totalPages, FALLBACK_PAGES);
+    const chapters = extractChapters(firstNText, textbookId);
+    const textbook: Textbook = {
+      textbookId, filename, title, totalPages, totalChars: fullText.length,
+      chapters, tocText: "", tocPageRange: null,
+      status: "partial",
+      statusDetail: `已解析前 ${Math.min(FALLBACK_PAGES, totalPages)}/${totalPages} 页`,
+      uploadedAt: Date.now(),
+    };
+    textbookStore.set(textbookId, textbook);
+
+    const chapterPageMap = chapters.map((c) => ({
+      title: c.title, pageStart: c.pageStart, pageEnd: c.pageEnd,
+    }));
+    const tGraph = await extractTOCGraph(firstNText, textbookId, chapterPageMap);
+    if (tGraph) tocGraphStore.set(textbookId, tGraph);
+    return { textbook, tocGraph: tGraph };
+  } catch (err) {
+    const textbook = makeError(textbookId, filename, `PDF 解析失败: ${String(err)}`);
+    textbookStore.set(textbookId, textbook);
+    return { textbook };
+  }
+}
+
 function makeError(id: string, filename: string, msg: string): Textbook {
   return {
     textbookId: id, filename, title: filename, totalPages: 0, totalChars: 0,
     chapters: [], tocText: "", tocPageRange: null,
-    status: "error", errorMessage: msg, uploadedAt: Date.now(),
+    status: "error", statusDetail: msg, errorMessage: msg, uploadedAt: Date.now(),
   };
 }
