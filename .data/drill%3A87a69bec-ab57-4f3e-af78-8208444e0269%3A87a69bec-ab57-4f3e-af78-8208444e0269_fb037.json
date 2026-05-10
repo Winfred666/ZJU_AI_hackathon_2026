@@ -1,0 +1,138 @@
+{
+  "nodes": [
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_01",
+      "name": "肌肉收缩效能",
+      "definition": "肌肉收缩时产生的张力大小、缩短程度，以及产生张力或缩短的速度",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 69,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_02",
+      "name": "前负荷",
+      "definition": "肌肉在收缩前所承受的负荷，决定初长度",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 69,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_03",
+      "name": "后负荷",
+      "definition": "肌肉在收缩后所承受的负荷",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 70,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_04",
+      "name": "肌肉收缩能力",
+      "definition": "与负荷无关又能影响肌肉收缩效能的肌肉内在特性",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 70,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_05",
+      "name": "收缩总和",
+      "definition": "肌细胞收缩的叠加特性，分为空间总和（多纤维总和/多运动单位总和）和时间总和（频率总和）",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 70,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_06",
+      "name": "长度-张力关系",
+      "definition": "肌肉初长度与主动张力之间的关系，存在最适初长度使收缩张力最大",
+      "category": "现象",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 69,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_07",
+      "name": "张力-速度关系",
+      "definition": "后负荷与肌肉缩短速度呈反变关系，后负荷增大则缩短速度减小",
+      "category": "现象",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 70,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_08",
+      "name": "多运动单位总和",
+      "definition": "通过增加参与同步收缩的运动单位数目来增强收缩强度的空间总和方式",
+      "category": "方法",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 71,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_09",
+      "name": "频率总和",
+      "definition": "通过提高骨骼肌收缩频率而产生叠加效应的时间总和方式",
+      "category": "方法",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 71,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_10",
+      "name": "完全强直收缩",
+      "definition": "后一次收缩过程叠加在前一次收缩过程的收缩期所产生的收缩总和，产生持续最大张力",
+      "category": "现象",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 71,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269"
+    }
+  ],
+  "relations": [
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_01",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_02",
+      "relationType": "contains",
+      "description": "肌肉收缩效能包含前负荷"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_01",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_03",
+      "relationType": "contains",
+      "description": "肌肉收缩效能包含后负荷"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_01",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_04",
+      "relationType": "contains",
+      "description": "肌肉收缩效能包含肌肉收缩能力"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_01",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_05",
+      "relationType": "contains",
+      "description": "肌肉收缩效能包含收缩总和"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_05",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_08",
+      "relationType": "contains",
+      "description": "收缩总和包含多运动单位总和"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_05",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_09",
+      "relationType": "contains",
+      "description": "收缩总和包含频率总和"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_09",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_drill_87a69bec-ab57-4f3e-af78-8208444e0269_fb037_d_10",
+      "relationType": "contains",
+      "description": "频率总和包含完全强直收缩"
+    }
+  ]
+}

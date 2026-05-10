@@ -1,8 +1,8 @@
 import { Textbook, TOCGraph, Chapter } from "@/types";
-import { parseTxtContent } from "@/lib/txt-parser";
-import { getTextbookTitle, estimatePages, extractChapters, extractTOC } from "@/lib/pdf-parser";
-import { extractTOCGraph } from "@/lib/toc-llm";
-import { sha256 } from "@/lib/hash";
+import { parseTxtContent } from "@/lib/text/txt-parser";
+import { getTextbookTitle, estimatePages, extractChapters, extractTOC } from "@/lib/pdf/pdf-parser";
+import { extractTOCGraph } from "@/lib/llm/toc-llm";
+import { sha256 } from "@/lib/utils/hash";
 import { getStore } from "@/lib/store";
 
 const TINY_FILE_BYTES = 50_000;
@@ -69,8 +69,6 @@ async function handlePdf(
     const fullText = data.text as string;
     const totalPages = data.numpages;
     console.log(`[parse] ${title} — ${totalPages}p, ${(fullText.length / 1000).toFixed(0)}k chars`);
-
-    await store.setPdfBuffer(textbookId, buffer);
 
     if (fileBytes < TINY_FILE_BYTES) {
       return buildResult(store, textbookId, title, fileBytes, totalPages, fullText, "full",

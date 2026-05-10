@@ -73,25 +73,13 @@ export class FileStore implements Store {
     }
   }
 
-  async getPdfBuffer(id: string): Promise<Buffer | null> {
-    try { return await fs.readFile(path.join(DATA_DIR, `${encodeURIComponent(NS.pdfBuffer(id))}.bin`)); }
-    catch { return null; }
-  }
-  async setPdfBuffer(id: string, buf: Buffer) {
-    await ensureDir();
-    await fs.writeFile(path.join(DATA_DIR, `${encodeURIComponent(NS.pdfBuffer(id))}.bin`), buf).catch(() => {});
-  }
-  async deletePdfBuffer(id: string) {
-    try { await fs.unlink(path.join(DATA_DIR, `${encodeURIComponent(NS.pdfBuffer(id))}.bin`)); } catch {}
-  }
-
   async getTextbookIdByHash(h: string) { return readJson<string>(NS.fileHash(h)); }
   async setFileHash(h: string, tid: string) { await writeJson(NS.fileHash(h), tid); }
 
   async deleteAll(tid: string) {
     await Promise.all([
       this.deleteTextbook(tid), this.deleteTOCGraph(tid),
-      this.deleteDrillGraphs(tid), this.deletePdfBuffer(tid),
+      this.deleteDrillGraphs(tid),
     ]);
   }
 }

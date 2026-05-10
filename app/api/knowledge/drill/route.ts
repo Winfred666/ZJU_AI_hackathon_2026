@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { drillRequestSchema, drillOutputSchema } from "@/lib/validators";
-import { llmGenerate } from "@/lib/llm";
+import { drillRequestSchema, drillOutputSchema } from "@/lib/validate/validators";
+import { llmGenerate } from "@/lib/llm/llm";
 import { KnowledgeGraph } from "@/types";
 import { getStore } from "@/lib/store";
-import { extractPageRange } from "@/lib/pdf-parser";
 
 const MAX_CONTENT_BYTES = 900_000;
 
@@ -40,19 +39,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ subGraph: cached, parentNodeId: chapterId });
     }
 
-    const buffer = await store.getPdfBuffer(textbookId);
-    if (!buffer) {
-      return NextResponse.json({ error: "PDF 缓存已过期，请重新上传" }, { status: 404 });
+    // Use stored chapter text instead of re-parsing PDF
+    const textbook = await store.getTextbook(textbookId);
+    const chapter = textbook?.chapters.find((c) => c.chapterId === chapterId);
+    if (!chapter?.content) {
+      return NextResponse.json({ error: "章节内容未找到，请重新上传教材" }, { status: 404 });
     }
 
-    const pdfParseMod = await import("pdf-parse");
-    const pdfParse = pdfParseMod.default ?? pdfParseMod;
-    const data = await pdfParse(buffer);
-    const fullText = data.text as string;
-    const totalPages = data.numpages;
-
-    let content = extractPageRange(fullText, totalPages, pageStart, pageEnd);
-
+    let content = chapter.content;
     if (new TextEncoder().encode(content).length > MAX_CONTENT_BYTES) {
       content = content.slice(0, Math.floor(MAX_CONTENT_BYTES * 0.5));
     }

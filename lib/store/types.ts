@@ -16,10 +16,6 @@ export interface Store {
   /** List all drill sub-graph keys for a textbook (returns chapterIds) */
   listDrillKeys(textbookId: string): Promise<string[]>;
 
-  getPdfBuffer(textbookId: string): Promise<Buffer | null>;
-  setPdfBuffer(textbookId: string, buffer: Buffer): Promise<void>;
-  deletePdfBuffer(textbookId: string): Promise<void>;
-
   getTextbookIdByHash(sha256: string): Promise<string | null>;
   setFileHash(sha256: string, textbookId: string): Promise<void>;
 

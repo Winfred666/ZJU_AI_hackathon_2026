@@ -5,7 +5,6 @@ export class MemoryStore implements Store {
   private textbooks = new Map<string, Textbook>();
   private tocGraphs = new Map<string, TOCGraph>();
   private drillGraphs = new Map<string, KnowledgeGraph>();
-  private pdfBuffers = new Map<string, Buffer>();
   private fileHashes = new Map<string, string>();
 
   async getTextbook(id: string) { return this.textbooks.get(id) ?? null; }
@@ -38,10 +37,6 @@ export class MemoryStore implements Store {
     }
   }
 
-  async getPdfBuffer(textbookId: string) { return this.pdfBuffers.get(textbookId) ?? null; }
-  async setPdfBuffer(textbookId: string, buffer: Buffer) { this.pdfBuffers.set(textbookId, buffer); }
-  async deletePdfBuffer(textbookId: string) { this.pdfBuffers.delete(textbookId); }
-
   async getTextbookIdByHash(sha256: string) { return this.fileHashes.get(sha256) ?? null; }
   async setFileHash(sha256: string, textbookId: string) { this.fileHashes.set(sha256, textbookId); }
 
@@ -52,6 +47,5 @@ export class MemoryStore implements Store {
     for (const key of this.drillGraphs.keys()) {
       if (key.startsWith(prefix)) this.drillGraphs.delete(key);
     }
-    this.pdfBuffers.delete(textbookId);
   }
 }
