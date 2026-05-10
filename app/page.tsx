@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useSessionStore } from "@/hooks/use-knowledge-graph";
 import { Textbook, KnowledgeGraph } from "@/types";
 import { useCallback } from "react";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const { textbooks, currentTextbookId, knowledgeGraph, ragReady, isLoading,
@@ -53,28 +54,73 @@ export default function HomePage() {
   }, [currentTextbookId, setError, setLoading, setRagReady]);
 
   return (
-    <div className="flex h-dvh flex-col">
-      <header className="flex items-center gap-2 border-b px-4 py-2">
-        <h1 className="text-lg font-semibold text-balance">学科知识整合智能体</h1>
-        {isLoading && <span className="text-xs text-muted-foreground">处理中...</span>}
+    <div className="flex h-dvh flex-col bg-background selection:bg-primary/10">
+      <header className="flex h-14 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <span className="text-xs font-bold">ZJU</span>
+          </div>
+          <h1 className="text-lg font-bold tracking-tight text-foreground/90">
+            医学知识整合智能体
+          </h1>
+        </div>
+        <div className="flex items-center gap-4">
+          {isLoading && (
+            <div className="flex items-center gap-2 text-xs font-medium text-primary animate-pulse">
+              <div className="size-1.5 rounded-full bg-primary" />
+              处理中...
+            </div>
+          )}
+          <div className="h-4 w-px bg-border" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">V0.1 MVP</span>
+        </div>
       </header>
-      <div className="flex flex-1 overflow-hidden">
-        <div className="flex w-1/5 min-w-[220px] flex-col border-r">
-          <div className="p-3"><UploadZone onUpload={handleUpload} disabled={isLoading} /></div>
-          <Separator />
-          <FileList textbooks={textbooks} selectedId={currentTextbookId} onSelect={selectTextbook} />
-        </div>
-        <div className="flex w-1/2 flex-col border-r bg-muted/20">
-          <div className="flex-1 p-2"><KnowledgeGraphView graph={knowledgeGraph} loading={isLoading} /></div>
-        </div>
-        <div className="flex w-[30%] min-w-[280px] flex-col p-3">
-          <KnowledgePanel textbookId={currentTextbookId} hasGraph={!!knowledgeGraph}
-            isExtracting={isLoading} isIndexing={isLoading}
-            onExtract={handleExtract} onBuildIndex={handleBuildIndex} />
-          <Separator className="my-3" />
-          <div className="flex-1"><RAGChat textbookId={currentTextbookId} indexReady={ragReady} /></div>
-        </div>
-      </div>
+
+      <main className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar: PDF Management */}
+        <aside className="flex w-1/5 min-w-[240px] flex-col border-r bg-muted/5">
+          <div className="p-4">
+            <UploadZone onUpload={handleUpload} disabled={isLoading} />
+          </div>
+          <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+            文献列表
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <FileList textbooks={textbooks} selectedId={currentTextbookId} onSelect={selectTextbook} />
+          </div>
+        </aside>
+
+        {/* Center: Knowledge Graph View */}
+        <section className="relative flex flex-1 flex-col bg-background p-4">
+          <div className={cn(
+            "flex-1 rounded-xl border bg-card shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)] transition-all duration-700",
+            knowledgeGraph ? "border-primary/10" : "border-dashed"
+          )}>
+            <KnowledgeGraphView graph={knowledgeGraph} loading={isLoading} />
+          </div>
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full border bg-background/80 px-4 py-1 text-[10px] font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
+            AntV/G6 可视化引擎
+          </div>
+        </section>
+
+        {/* Right Sidebar: Controls & Chat */}
+        <aside className="flex w-[340px] flex-col border-l bg-muted/5 p-4">
+          <div className="rounded-xl border bg-card p-4 shadow-sm">
+            <KnowledgePanel 
+              textbookId={currentTextbookId} 
+              hasGraph={!!knowledgeGraph}
+              isExtracting={isLoading} 
+              isIndexing={isLoading}
+              onExtract={handleExtract} 
+              onBuildIndex={handleBuildIndex} 
+            />
+          </div>
+          <Separator className="my-6 opacity-40" />
+          <div className="flex flex-1 flex-col min-h-0">
+            <RAGChat textbookId={currentTextbookId} indexReady={ragReady} />
+          </div>
+        </aside>
+      </main>
     </div>
   );
 }

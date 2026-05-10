@@ -20,6 +20,21 @@ function silenceG6Console<T>(fn: () => T): T {
   }
 }
 
+/**
+ * Utility to read CSS variables for G6 configuration
+ */
+function getThemeVars() {
+  if (typeof window === "undefined") return null;
+  const style = getComputedStyle(document.documentElement);
+  return {
+    nodeFill: style.getPropertyValue("--g6-node-fill").trim() || "#1e3a8a",
+    nodeLabel: style.getPropertyValue("--g6-node-label").trim() || "#1e3a8a",
+    edgeStroke: style.getPropertyValue("--g6-edge-stroke").trim() || "#cbd5e1",
+    edgeLabel: style.getPropertyValue("--g6-edge-label").trim() || "#64748b",
+    background: style.getPropertyValue("--g6-background").trim() || "transparent",
+  };
+}
+
 export function KnowledgeGraphView({
   graph,
   loading,
@@ -29,15 +44,14 @@ export function KnowledgeGraphView({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphRef = useRef<{ destroy: () => void } | null>(null);
-  // Token-based stale-import guard: each effect invocation gets a unique
-  // token. When an async import resolves it checks whether a newer effect
-  // has already been scheduled (React Strict Mode double-invoke, HMR).
   const tokenRef = useRef(0);
 
   useEffect(() => {
     if (!graph || !containerRef.current) return;
 
     const token = ++tokenRef.current;
+    const theme = getThemeVars();
+    if (!theme) return;
 
     // Clear any previous G6 canvas left by Strict Mode double-invoke
     if (graphRef.current) {
@@ -47,8 +61,6 @@ export function KnowledgeGraphView({
     containerRef.current.innerHTML = "";
 
     import("@antv/g6").then((mod) => {
-      // Bail if a newer effect invocation has started (Stale import from
-      // Strict Mode double-invoke or rapid dependency changes).
       if (token !== tokenRef.current) return;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,45 +86,40 @@ export function KnowledgeGraphView({
         layout: {
           type: "d3-force",
           linkDistance: 150,
-          collide: 50,
-          manyBody: { strength: -300 },
+          collide: 60,
+          manyBody: { strength: -400 },
           animate: true,
         },
         node: {
           style: {
-            size: 42,
-            labelText: (d: { data?: { label?: string } }) =>
-              d.data?.label ?? "",
+            size: 48,
+            fill: theme.nodeFill,
+            stroke: theme.nodeFill,
+            labelText: (d: { data?: { label?: string } }) => d.data?.label ?? "",
             labelPlacement: "bottom",
-            labelFontSize: 11,
-            labelFill: "#1a1a1a",
-            labelOffsetY: 6,
-          },
-          palette: {
-            field: (d: { data?: { category?: string } }) => d.data?.category,
-            color: ["#7e3feb", "#f59e0b", "#10b981", "#3b82f6"],
+            labelFontSize: 12,
+            labelFill: theme.nodeLabel,
+            labelFontWeight: "500",
+            labelOffsetY: 8,
           },
           state: {
-            active: { halo: true, haloFill: "#7e3feb", haloOpacity: 0.25 },
+            active: { halo: true, haloFill: theme.nodeFill, haloOpacity: 0.15 },
+            selected: { stroke: theme.nodeFill, lineWidth: 3 },
           },
         },
         edge: {
           style: {
-            stroke: (d: { data?: { relationType?: string } }) =>
-              d.data?.relationType === "prerequisite" ? "#ef4444" : "#8b9baf",
-            lineDash: (d: { data?: { relationType?: string } }) =>
-              d.data?.relationType === "prerequisite" ? [6, 4] : [],
+            stroke: theme.edgeStroke,
             endArrow: true,
-            lineWidth: 2,
-            labelText: (d: { data?: { label?: string } }) =>
-              d.data?.label ?? "",
-            labelFill: "#8b9baf",
+            lineWidth: 1.5,
+            labelText: (d: { data?: { label?: string } }) => d.data?.label ?? "",
+            labelFill: theme.edgeLabel,
             labelFontSize: 10,
             labelBackground: true,
             labelBackgroundFill: "#fff",
-            labelBackgroundOpacity: 0.8,
+            labelBackgroundOpacity: 0.9,
             labelBackgroundRadius: 4,
-            labelPadding: [1, 4],
+            labelPadding: [2, 4],
           },
         },
         behaviors: [
@@ -120,6 +127,7 @@ export function KnowledgeGraphView({
           "drag-canvas",
           "drag-element",
           "hover-element",
+          "click-element",
         ],
         animation: true,
       });

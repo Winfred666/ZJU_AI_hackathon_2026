@@ -6,7 +6,7 @@ describe("Home page", () => {
   it("renders the app title", () => {
     render(<Home />);
     expect(
-      screen.getByRole("heading", { name: /学科知识整合智能体/i }),
+      screen.getByRole("heading", { name: /知识整合智能体/i }),
     ).toBeInTheDocument();
   });
 
