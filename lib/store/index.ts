@@ -6,6 +6,8 @@ export function getStore(): Store {
   if (_store) return _store;
 
   let s: Store;
+  // Vercel serverless: filesystem is ephemeral — use MemoryStore
+  // Local dev: use FileStore for persistence across restarts
   if (process.env.VERCEL) {
     const { MemoryStore } = require("./memory-store");
     s = new MemoryStore();

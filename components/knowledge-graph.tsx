@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import { KnowledgeGraph as KG, KnowledgeNode } from "@/types";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Home } from "lucide-react";
+import { Home, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // G6 v5.1.1 calls console.error internally during destroy() with
@@ -64,21 +63,61 @@ export function KnowledgeGraphView({
     const theme = getThemeVars();
     if (!theme) return;
 
-    // Clear any previous G6 canvas left by Strict Mode double-invoke
-    if (graphRef.current) {
-      silenceG6Console(() => graphRef.current!.destroy());
-      graphRef.current = null;
-    }
-    containerRef.current.innerHTML = "";
-
     import("@antv/g6").then((mod) => {
       if (token !== tokenRef.current) return;
-
       const G6Graph = mod.Graph as any;
 
+      if (graphRef.current) {
+        // Instead of destroying, just update data if instance exists
+        graphRef.current.updateData({
+          nodes: graph.nodes.map((n) => ({
+            id: n.id,
+            style: {
+              size: 24,
+              fill: theme.nodeFill,
+              stroke: theme.nodeFill,
+              labelText: n.name,
+              labelPlacement: "bottom",
+              labelFontSize: 10,
+              labelFill: theme.nodeLabel,
+              labelFontWeight: "500",
+              labelOffsetY: 4,
+            },
+            data: { label: n.name, category: n.category },
+          })),
+          edges: graph.relations.map((r) => ({
+            source: r.source,
+            target: r.target,
+            style: {
+              stroke: theme.edgeStroke,
+              endArrow: true,
+              lineWidth: 1,
+              labelText: r.relationType === "prerequisite" ? "前置" : "包含",
+              labelFill: theme.edgeLabel,
+              labelFontSize: 9,
+              labelBackground: true,
+              labelBackgroundFill: "#fff",
+              labelBackgroundOpacity: 0.9,
+              labelBackgroundRadius: 4,
+              labelPadding: [2, 4],
+            },
+            data: {
+              label: r.relationType === "prerequisite" ? "前置" : "包含",
+              relationType: r.relationType,
+            },
+          })),
+        });
+        graphRef.current.render();
+        return;
+      }
+
+      if (!containerRef.current) return;
+
+      containerRef.current.innerHTML = "";
+
       // Calculate container dimensions for initial random scatter
-      const width = containerRef.current?.clientWidth || 800;
-      const height = containerRef.current?.clientHeight || 600;
+      const width = containerRef.current.clientWidth || 800;
+      const height = containerRef.current.clientHeight || 600;
 
       const g = new G6Graph({
         container: containerRef.current!,
@@ -181,8 +220,21 @@ export function KnowledgeGraphView({
     };
   }, [graph, onNodeDoubleClick]);
 
-  if (loading) return <Skeleton className="size-full" />;
+
+
   if (!graph || graph.nodes.length === 0) {
+    if (loading) {
+      return (
+        <div className="flex size-full items-center justify-center bg-background/50 backdrop-blur-[1px]">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="size-8 animate-spin text-primary/80" />
+            <div className="text-xs font-medium text-muted-foreground/80 tracking-wider">
+              正在生成知识图谱...
+            </div>
+          </div>
+        </div>
+      );
+    }
     return (
       <div
         className="flex size-full items-center justify-center text-sm text-muted-foreground"
@@ -196,6 +248,19 @@ export function KnowledgeGraphView({
   return (
     <div className="relative size-full overflow-hidden rounded-xl bg-background/50">
       <div ref={containerRef} className="size-full" data-testid="knowledge-graph" />
+      {loading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/50 backdrop-blur-[1px]">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="size-8 animate-spin text-primary/80" />
+            <div className="text-xs font-medium text-muted-foreground/80 tracking-wider">
+              正在扩展知识图谱...
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="pointer-events-none absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full border bg-background/80 px-3 py-1.5 text-[10px] font-medium text-muted-foreground shadow-sm backdrop-blur-sm transition-opacity duration-300">
+        Double click to extend graph
+      </div>
       <Button
         variant="outline"
         size="icon"
