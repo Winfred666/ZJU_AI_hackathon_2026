@@ -161,16 +161,12 @@ async function handlePdf(
 
 async function extractPdfText(buffer: Buffer): Promise<string> {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  const data = new Uint8Array(buffer);
-  const doc = await pdfjs.getDocument({ data, disableWorker: true } as never).promise;
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(buffer) }).promise;
   const pages: string[] = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i);
     const content = await page.getTextContent();
-    const pageText = content.items
-      .map((item) => ("str" in item ? item.str : ""))
-      .join(" ");
-    pages.push(pageText);
+    pages.push(content.items.map((item) => ("str" in item ? item.str : "")).join(" "));
   }
   return pages.join("\n");
 }
