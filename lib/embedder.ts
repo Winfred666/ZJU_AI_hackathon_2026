@@ -1,15 +1,15 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { embed, embedMany } from "ai";
 import type { EmbeddingModel } from "ai";
-import { env } from "./env";
+import { apiKey, apiEndpoint, apiModel } from "./env";
 
 const openai = createOpenAI({
-  apiKey: env.BACKBONE_MODEL_API,
-  baseURL: env.BACKBONE_MODEL_ENDPOINT,
+  apiKey,
+  baseURL: apiEndpoint,
 });
 
 export function getEmbeddingModel(): EmbeddingModel {
-  return openai.textEmbeddingModel(env.BACKBONE_MODEL);
+  return openai.textEmbeddingModel(apiModel);
 }
 
 export async function embedSingle(text: string): Promise<number[]> {

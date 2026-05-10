@@ -1,14 +1,14 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, LanguageModel } from "ai";
-import { env } from "./env";
+import { apiKey, apiEndpoint, apiModel } from "./env";
 
 const openai = createOpenAI({
-  apiKey: env.BACKBONE_MODEL_API,
-  baseURL: env.BACKBONE_MODEL_ENDPOINT,
+  apiKey,
+  baseURL: apiEndpoint,
 });
 
 export function getLanguageModel(): LanguageModel {
-  return openai.languageModel(env.BACKBONE_MODEL);
+  return openai.languageModel(apiModel);
 }
 
 export interface LLMGenerateOptions {
