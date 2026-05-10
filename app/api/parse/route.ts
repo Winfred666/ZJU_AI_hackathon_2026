@@ -89,11 +89,8 @@ async function handlePdf(
   const title = getTextbookTitle(filename);
 
   try {
-    const { PDFParse } = await import("pdf-parse");
-    const parser = new PDFParse({ data: buffer });
-    const textResult = await parser.getText();
-    const fullText = textResult.text as string;
-    const totalPages = textResult.total;
+    const fullText = await extractPdfText(buffer);
+    const totalPages = estimatePages(fullText);
 
     // ── Tiny file (< 50KB): parse fully, send whole text to LLM ──
     if (fileBytes < TINY_FILE_BYTES) {
@@ -160,6 +157,22 @@ async function handlePdf(
     textbookStore.set(textbookId, textbook);
     return { textbook };
   }
+}
+
+async function extractPdfText(buffer: Buffer): Promise<string> {
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  pdfjs.GlobalWorkerOptions.workerSrc = "";
+  const doc = await pdfjs.getDocument({ data: buffer }).promise;
+  const pages: string[] = [];
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const content = await page.getTextContent();
+    const pageText = content.items
+      .map((item) => ("str" in item ? item.str : ""))
+      .join(" ");
+    pages.push(pageText);
+  }
+  return pages.join("\n");
 }
 
 function makeError(id: string, filename: string, msg: string): Textbook {
