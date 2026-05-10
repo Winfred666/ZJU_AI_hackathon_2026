@@ -43,5 +43,5 @@ export function estimatePages(text: string): number {
 }
 
 export function getTextbookTitle(filename: string): string {
-  return filename.replace(/\.(pdf|txt|md)$/i, "").replace(/[_\-]/g, " ");
+  return filename.replace(/\.(pdf|txt|md|docx|xlsx|xls)$/i, "").replace(/[_\-]/g, " ");
 }

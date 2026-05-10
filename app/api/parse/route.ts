@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Textbook } from "@/types";
-import { parseTxtContent } from "@/lib/txt-parser";
 import { getTextbookTitle, estimatePages, extractChapters } from "@/lib/pdf-parser";
+import { routeFile, getExt, isSupported } from "@/lib/file-router";
 
 export const textbookStore = new Map<string, Textbook>();
 
@@ -19,13 +19,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     for (const file of files) {
       const textbookId = crypto.randomUUID();
       const filename = file.name;
-      const ext = filename.split(".").pop()?.toLowerCase();
+      const ext = getExt(filename);
 
-      if (!ext || !["pdf", "txt", "md"].includes(ext)) {
+      if (!ext || !isSupported(ext)) {
         results.push({
           textbookId, filename, title: filename, totalPages: 0, totalChars: 0,
           chapters: [], status: "error",
-          errorMessage: `不支持的文件格式: .${ext}`,
+          errorMessage: `不支持的文件格式: .${ext || "unknown"}`,
           uploadedAt: Date.now(),
         });
         continue;
@@ -34,6 +34,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
+      // PDF: handled specially because pdf-parse returns page count metadata
       if (ext === "pdf") {
         try {
           const { PDFParse } = await import("pdf-parse");
@@ -57,13 +58,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         continue;
       }
 
-      const rawText = new TextDecoder("utf-8").decode(buffer);
-      const { chapters, fullText } = parseTxtContent(rawText, textbookId);
-      results.push({
-        textbookId, filename, title: getTextbookTitle(filename),
-        totalPages: estimatePages(fullText), totalChars: fullText.length,
-        chapters, status: "ready", uploadedAt: Date.now(),
-      });
+      // All other formats: route via file-router
+      try {
+        const { chapters, fullText } = await routeFile(buffer, filename, textbookId);
+        results.push({
+          textbookId, filename, title: getTextbookTitle(filename),
+          totalPages: estimatePages(fullText), totalChars: fullText.length,
+          chapters, status: "ready", uploadedAt: Date.now(),
+        });
+      } catch (err) {
+        results.push({
+          textbookId, filename, title: getTextbookTitle(filename),
+          totalPages: 0, totalChars: 0, chapters: [], status: "error",
+          errorMessage: `${ext.toUpperCase()} 解析失败: ${String(err)}`,
+          uploadedAt: Date.now(),
+        });
+      }
     }
 
     for (const r of results) textbookStore.set(r.textbookId, r);
