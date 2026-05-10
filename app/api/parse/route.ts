@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Textbook } from "@/types";
+import { Textbook, TOCGraph } from "@/types";
 import { parseTxtContent } from "@/lib/txt-parser";
-import { getTextbookTitle, estimatePages, extractChapters } from "@/lib/pdf-parser";
+import {
+  getTextbookTitle,
+  estimatePages,
+  extractChapters,
+  extractTOC,
+} from "@/lib/pdf-parser";
+import { extractTOCGraph } from "@/lib/toc-llm";
 
 export const textbookStore = new Map<string, Textbook>();
+export const tocGraphStore = new Map<string, TOCGraph>();
+
+const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB hard limit for upload
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
@@ -15,19 +24,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const results: Textbook[] = [];
+    const tocGraphs: Record<string, TOCGraph | null> = {};
 
     for (const file of files) {
       const textbookId = crypto.randomUUID();
       const filename = file.name;
       const ext = filename.split(".").pop()?.toLowerCase();
 
+      if (file.size > MAX_FILE_BYTES) {
+        results.push(makeError(textbookId, filename, `文件过大 (最大50MB)`));
+        continue;
+      }
+
       if (!ext || !["pdf", "txt", "md"].includes(ext)) {
-        results.push({
-          textbookId, filename, title: filename, totalPages: 0, totalChars: 0,
-          chapters: [], status: "error",
-          errorMessage: `不支持的文件格式: .${ext}`,
-          uploadedAt: Date.now(),
-        });
+        results.push(makeError(textbookId, filename, `不支持的文件格式: .${ext}`));
         continue;
       }
 
@@ -40,35 +50,70 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           const parser = new PDFParse({ data: buffer });
           const textResult = await parser.getText();
           const fullText = textResult.text as string;
-          results.push({
-            textbookId, filename, title: getTextbookTitle(filename),
-            totalPages: textResult.total, totalChars: fullText.length,
-            chapters: extractChapters(fullText, textbookId),
+          const totalPages = textResult.total;
+          const title = getTextbookTitle(filename);
+          const chapters = extractChapters(fullText, textbookId);
+          const { tocText, pageRange } = extractTOC(fullText, totalPages);
+
+          const textbook: Textbook = {
+            textbookId, filename, title,
+            totalPages, totalChars: fullText.length,
+            chapters, tocText, tocPageRange: pageRange,
             status: "ready", uploadedAt: Date.now(),
-          });
+          };
+
+          results.push(textbook);
+          textbookStore.set(textbookId, textbook);
+
+          // Auto-extract TOC graph if TOC found
+          if (tocText) {
+            const chapterPageMap = chapters.map((c) => ({
+              title: c.title,
+              pageStart: c.pageStart,
+              pageEnd: c.pageEnd,
+            }));
+            const tGraph = await extractTOCGraph(tocText, textbookId, chapterPageMap);
+            if (tGraph) {
+              tocGraphStore.set(textbookId, tGraph);
+              tocGraphs[textbookId] = tGraph;
+            } else {
+              tocGraphs[textbookId] = null;
+            }
+          } else {
+            tocGraphs[textbookId] = null;
+          }
         } catch (err) {
-          results.push({
-            textbookId, filename, title: getTextbookTitle(filename),
-            totalPages: 0, totalChars: 0, chapters: [], status: "error",
-            errorMessage: `PDF 解析失败: ${String(err)}`,
-            uploadedAt: Date.now(),
-          });
+          results.push(makeError(textbookId, filename, `PDF 解析失败: ${String(err)}`));
         }
         continue;
       }
 
+      // TXT / MD: parse as text, no TOC auto-detection (no page concept)
       const rawText = new TextDecoder("utf-8").decode(buffer);
       const { chapters, fullText } = parseTxtContent(rawText, textbookId);
-      results.push({
+
+      const textbook: Textbook = {
         textbookId, filename, title: getTextbookTitle(filename),
         totalPages: estimatePages(fullText), totalChars: fullText.length,
-        chapters, status: "ready", uploadedAt: Date.now(),
-      });
+        chapters, tocText: "", tocPageRange: null,
+        status: "ready", uploadedAt: Date.now(),
+      };
+
+      results.push(textbook);
+      textbookStore.set(textbookId, textbook);
+      tocGraphs[textbookId] = null;
     }
 
-    for (const r of results) textbookStore.set(r.textbookId, r);
-    return NextResponse.json({ textbooks: results });
+    return NextResponse.json({ textbooks: results, tocGraphs });
   } catch (err) {
     return NextResponse.json({ error: `解析失败: ${String(err)}` }, { status: 500 });
   }
+}
+
+function makeError(id: string, filename: string, msg: string): Textbook {
+  return {
+    textbookId: id, filename, title: filename, totalPages: 0, totalChars: 0,
+    chapters: [], tocText: "", tocPageRange: null,
+    status: "error", errorMessage: msg, uploadedAt: Date.now(),
+  };
 }
