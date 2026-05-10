@@ -51,9 +51,15 @@ yarn-error.log*
 .claude/
 .mcp.json
 
-# file-based database
-.data/
+# file-based database (track JSON graphs, ignore large PDF buffers)
+.data/*.bin
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# temp scripts / crash dumps
+fix_*.js
+patch*.js
+refactor_*.js
+*.stackdump

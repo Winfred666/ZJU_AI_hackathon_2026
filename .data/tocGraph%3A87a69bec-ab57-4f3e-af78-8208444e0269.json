@@ -1,0 +1,1122 @@
+{
+  "nodes": [
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb001",
+      "name": "第一章  绪论1",
+      "definition": "第一章  绪论1 第一节　生理学的研究对象和任务  ........................................ 1 一、  生理学的研究对象  ..................................................... 1 二、  生理学的研究任务  ...............................................",
+      "category": "核心概念",
+      "chapter": "第一章  绪论1",
+      "page": 12,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 12,
+        "end": 15
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb002",
+      "name": "第二章  细胞的基本功能13",
+      "definition": "第二章  细胞的基本功能13 第一节　细胞膜的物质转运功能 ........................................... 13 一、  细胞膜的化学组成及其分子排列形式  ............................. 13 二、  跨细胞膜的物质转运  ................................................ 14 第",
+      "category": "核心概念",
+      "chapter": "第二章  细胞的基本功能13",
+      "page": 15,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 15,
+        "end": 16
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb003",
+      "name": "第三章  血液53",
+      "definition": "第三章  血液53 第一节　血液生理概述  ....................................................... 53 一、  血液的组成  ........................................................... 53 二、  血液的理化特性  ................................",
+      "category": "核心概念",
+      "chapter": "第三章  血液53",
+      "page": 16,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 16,
+        "end": 17
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb004",
+      "name": "第四章  血液循环79",
+      "definition": "第四章  血液循环79 第一节　心脏的泵血功能  .................................................... 79 一、  心脏的泵血过程和机制  ............................................. 79 二、  心输出量与心脏泵血功能的储备  ..................................",
+      "category": "核心概念",
+      "chapter": "第四章  血液循环79",
+      "page": 17,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 17,
+        "end": 19
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb005",
+      "name": "第五章  呼吸135",
+      "definition": "第五章  呼吸135 第一节　肺通气  .............................................................. 135 一、  肺通气的原理  ........................................................ 136 二、  肺通气功能的评价  ..........................",
+      "category": "核心概念",
+      "chapter": "第五章  呼吸135",
+      "page": 19,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 19,
+        "end": 20
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb006",
+      "name": "第六章  消化和吸收165",
+      "definition": "第六章  消化和吸收165 第一节　消化生理概述  ..................................................... 165 一、  消化道平滑肌的特性  ............................................... 165 二、  消化腺的分泌功能  ...................................",
+      "category": "核心概念",
+      "chapter": "第六章  消化和吸收165",
+      "page": 20,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 20,
+        "end": 23
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb007",
+      "name": "第七章  能量代谢与体温196",
+      "definition": "第七章  能量代谢与体温196 第一节　能量代谢  ........................................................... 196 一、  机体能量的来源与利用  ............................................ 196 二、  能量代谢的测定  ................................",
+      "category": "核心概念",
+      "chapter": "第七章  能量代谢与体温196",
+      "page": 23,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 23,
+        "end": 24
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb008",
+      "name": "第八章  尿的生成和排出213",
+      "definition": "第八章  尿的生成和排出213 第一节　肾的功能解剖和肾血流量  ..................................... 213 一、  肾的功能解剖  ........................................................ 213 二、  肾血流量的特点及其调节  ...................................",
+      "category": "核心概念",
+      "chapter": "第八章  尿的生成和排出213",
+      "page": 24,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 24,
+        "end": 26
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb009",
+      "name": "第九章  感觉器官的功能242",
+      "definition": "第九章  感觉器官的功能242 第一节　感觉概述  ........................................................... 242 一、  感受器和感觉器官  .................................................. 242 二、  感受器的一般生理特性  .........................",
+      "category": "核心概念",
+      "chapter": "第九章  感觉器官的功能242",
+      "page": 26,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 26,
+        "end": 28
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb010",
+      "name": "第十章  神经系统的功能280",
+      "definition": "第十章  神经系统的功能280 第一节　神经系统功能活动的基本原理  ............................... 280 一、  神经元和神经胶质细胞  ............................................ 280 二、  突触传递  ......................................................",
+      "category": "核心概念",
+      "chapter": "第十章  神经系统的功能280",
+      "page": 28,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 28,
+        "end": 30
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb011",
+      "name": "第十一章  内分泌337",
+      "definition": "第十一章  内分泌337 第一节　内分泌与激素  ..................................................... 337 一、  内分泌与内分泌系统  ............................................... 337 二、  激素的分类  .......................................",
+      "category": "核心概念",
+      "chapter": "第十一章  内分泌337",
+      "page": 30,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 30,
+        "end": 32
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb012",
+      "name": "第十二章  生殖383",
+      "definition": "第十二章  生殖383 第一节　男性生殖功能及其调节 ......................................... 383 一、  睾丸的功能  .......................................................... 383 二、  睾丸功能的调节  ........................................",
+      "category": "核心概念",
+      "chapter": "第十二章  生殖383",
+      "page": 32,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 32,
+        "end": 33
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb013",
+      "name": "第十三章  生长发育和衰老400",
+      "definition": "第十三章  生长发育和衰老400 第一节　生长发育  ........................................................... 400 一、  机体生长发育的规律  ............................................... 400 二、  影响机体生长发育的因素  .........................",
+      "category": "核心概念",
+      "chapter": "第十三章  生长发育和衰老400",
+      "page": 33,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 33,
+        "end": 34
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb014",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 绪论是本书各章内容的宏观概括和共性提炼。在本章中，我们将介绍生理学研究的对象和任务、 生理学常用的研究方法、机体生命活动的基本特征、内环境及其稳态，并概括性地阐述机体生理功能 的调节。通过绪论的学习，可使学习者建立对生理学的总体认识，了解细胞、组织、器官、系统和机体 整体生命活动之间的联系，理解维持机体内环境相对稳定即稳态的重要性。实际上，机体生命活动的 一切调节几乎都是围绕着保持这",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 34,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 34,
+        "end": 35
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb015",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 2 压均是临床上必不可少的观察指标，而生理学为其提供了正常的参考值范围。所以在临床上，诊断、 治疗、康复等环节都离不开生理学提供的正常对照。同样，认识了人体正常生理功能之后，人们便可 以更好地认识疾病发展的规律和病理变化特点，从而促进临床诊疗水平的进步。如心电生理的研究 促成了经导管射频消融技术在治疗心律失常中的应用。 由此可见，生理学的研究为现代医学提供了重要的科学基础，而对临床治",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 35,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 35,
+        "end": 36
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb016",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 3 （一）  从器官和系统层面研究生理学 为了阐明机体的生命活动规律，首先需要认识器官、系统的特殊功能。早期的生理学研究主要对 机体器官和系统的功能活动进行研究，即着重阐明器官和系统的功能活动规律以及调控因素。例如 对消化系统的研究是以机械性消化和化学性消化两种方式探讨食物在口腔、胃、小肠和大肠的消化吸 收过程，并围绕食物的消化吸收过程所进行的系列调节活动，构成对整个消化系统功能的系",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 36,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 36,
+        "end": 37
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb017",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 4 们很难将对机体有害的或对机体存在潜在损害的实验在人体上进行。因此，利用动物实验来探讨人 体的某些生理功能及其产生机制是不可或缺的。但人类也认识到生命伦理的重要性，并制订了减少、 替代和优化（reduction，replacement，refinement）的“3R”原则，以规范使用实验动物的研究行为。通 过减少、替代和优化，尽量减少实验动物的使用数量，尽量减轻对动物的伤害，从而科",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 37,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 37,
+        "end": 38
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb018",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 5 的研究是从初步观察记录开始的，并通过假设推断来认识人体的构造和生理活动方式。公元 2—3 世 纪，古罗马医生盖伦（Claudius Galen）就开始采取观察、假设、类比思维的方法认识人体的功能活动。 威廉·哈维首次把物理学的思路和数学方法引入生物医学研究。他坚持用观察与实验来替代主观的 推测，通过活体动物实验发现了血液循环，使生理学研究走上了实验科学的正确轨道（图 1 - 2）",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 38,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 38,
+        "end": 39
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb019",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 6 代谢与分解代谢）和能量代谢（能量产生与转换利用）。新陈代谢一旦停止，生命活动就会结束，因此 新陈代谢是机体生命活动最基本的特征。 二、 兴奋性 机体生存在一定的环境中，当环境发生变化时，机体会主动对环境的变化作出适宜的反应。在 日常生活中，当人的手接触到发烫的热水时，会马上缩回来，避开热水的烫伤；当动脉血压突然增高 时，会反射性引起血压回降到正常水平。在生理学上，这种作用于机体的",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 39,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 39,
+        "end": 40
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb020",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 7 繁殖方式产生或形成与本身相似的子代个体。无性生殖是指不经过两性生殖细胞结合，由母体直接 产生新个体的生殖方式，如分裂生殖等。有性生殖是指由亲代产生的有性生殖细胞，经过两性生殖细 胞—精子和卵细胞的结合，成为受精卵，再由受精卵发育成为新的个体的生殖方式。人类通过有性 生殖这种生殖方式使新的个体得以产生，遗传信息得以代代相传。生命从产生、生长发育、成熟、衰老 至死亡的过程也是生物体的",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 40,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 40,
+        "end": 41
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb021",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 8 及营养成分等都保持在一个适宜的相对恒定的水平，从而维持其相对稳定。 稳态具有十分重要的生理意义。因为细胞的各种代谢活动都是酶促生化反应，所以细胞外液中 需要有足够的营养物质、氧气和水分，还需要适宜的温度、离子浓度、酸碱度和渗透压等；细胞膜两侧 不同的离子浓度分布也是可兴奋细胞保持其正常兴奋性和产生生物电的基本保证。如果内环境的理 化条件发生重大变化或急骤变化，超过机体本身调节与维",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 41,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 41,
+        "end": 42
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb022",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 9 适应性反应，保证生命活动的正常进行。 一、 神经调节 神经调节（nervous regulation）是在神经系统的参与下通过神经反射活动而调节机体生理功能的 一种调节方式，是人体生理功能调节中最重要的调节形式。反射（reflex）是机体在中枢神经系统的 参与下对内、外环境刺激做出的规律性应答，是神经调节的基本形式。反射活动的结构基础为反射弧 （reflex arc），它由五个基",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 42,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 42,
+        "end": 44
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb023",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 10 相互配合、共同调节，维持内环境的稳态，保证机体生理活动的正常进行。因此，面对内、外环境的变 化，正常生理范围内的调节总是朝着使内环境保持相对稳定的方向进行。认识这一点，对于初学生理 学的人理解和掌握机体生理调节的特点和规律尤为关键。 第六节 | 人体内自动控制系统 人体内存在许多不同类型的复杂的控制系统，精密地调节着人体生命活动。1948 年，美国数学 家诺伯特·维纳（Norb",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 44,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 44,
+        "end": 45
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb024",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 11 中枢，中枢再通过加强机体的散热器官的活动，促进散热使体温回降到 37°C；相反，当体温低于 37°C 时，又可通过促进产热活动和抑制散热活动使体温恢复 37°C。通过这种负反馈调节使体温维持在调 定点设置的正常水平。正常机体内，血糖浓度、pH、血压、循环血量和渗透压等也是在负反馈控制系 统的作用下保持稳定的。 （二）  正反馈控制系统 正反馈控制系统也是闭环控制系统，来自受控部",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 45,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 45,
+        "end": 46
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb025",
+      "name": "第一章 绪论",
+      "definition": "第一章 绪论 12 第七节 | 生理学发展的回顾和展望 生理学是一门古老而又年轻、不断焕发新活力的科学。早在公元前，人类已经开始对生命活动现 象进行初步的观察。公元前五世纪，古希腊医生希波克拉底（Hippocrates，约公元前 460—公元前 370 年）提出，人体的生命活动是由水、火、金、土四种基本流质，即热性的血液、冷性的黏液、黑胆汁（静脉 血）和黄胆汁决定的。几乎与此同时，我国第一部医学典",
+      "category": "核心概念",
+      "chapter": "第一章 绪论",
+      "page": 46,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 46,
+        "end": 47
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb026",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 细胞（cell）是构成人体的基本结构和功能单位。人体各器官和系统的功能活动都与构成该器官 和系统的细胞群体密不可分。人体大约有 10 14 个细胞，按其功能可分为两百余种。每一种细胞主要 执行一种特定的功能，也有的细胞可执行多种功能，但某些功能活动是所有细胞或某些细胞群体所共 有的。例如，所有细胞都具有物质跨膜转运功能、信号转导功能和生物电现象；约占人体体重一半的 各种肌细",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 47,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 47,
+        "end": 48
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb027",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 14 都分布在膜的外层，含氨基酸的磷脂（磷脂酰丝氨酸、磷脂酰乙醇胺、磷脂酰肌醇）主要分布在膜的内 层。其中，磷脂酰肌醇的含量虽然很少，但可作为细胞内第二信使三磷酸肌醇（IP 3 ）和二酰甘油（DG） 的供体，在跨膜信号转导中发挥重要作用（见本章第二节）。 细胞膜的脂质分子都是同时具有亲水性和疏水性的双嗜性分子（amphiphilic molecule），这种双嗜 特性使之在",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 48,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 48,
+        "end": 49
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb028",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 15 分子物质，如 O 2 、C O 2 、N 2 、类固醇激素、乙醇、尿素、甘油、水等。根据相似相溶原理，高脂溶性物质容 易穿越脂质双层，因此 O 2 、C O 2 、N 2 等高脂溶性小分子的跨膜扩散速度很快（如呼吸时肺毛细血管与肺 泡之间的气体交换）；水是不带电荷的极性小分子，也能以单纯扩散的方式通过细胞膜，但脂质双层对 水的通透性很低，故通常扩散速度很慢；分子较大的",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 49,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 49,
+        "end": 51
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb029",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 16 channel），这类通道受膜电位调控（图2 - 4A）。当膜两侧电位差发生改变，通常是在膜发生去极化时， 通道蛋白分子内的一些带电化学基团（也称电位感受区）发生移动，进而引起分子构象变化和闸门 开放，如神经细胞轴突膜中的电压门控钠通道。电压门控通道的开放是神经或肌肉产生动作电位 的基本机制。体内也有少量电压门控通道是在膜发生超极化时才打开的，如存在于心肌细胞膜中 的",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 51,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 51,
+        "end": 52
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb030",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 17 此外，也有少数通道始终是开放的，这类通道被称为非门控通道，如神经纤维上的钾漏通道（potass - ium leak channel），心肌细胞的内向整流钾通道（inward rectifier K +  channel，I K1  channel）、视杆细胞的非 门控钾通道等。 细胞膜中除离子通道外，还存在一些转运非离子成分的通道，如尿素通道蛋白（urea tran",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 52,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 52,
+        "end": 54
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb031",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 18 表2 - 1 常见葡萄糖转运体的种类、分布及主要功能 亚型分布功能 GLUT1    几乎所有细胞基本葡萄糖转运 GLUT2    肝细胞、胰岛 β 细胞葡萄糖的双向转运，取决于质膜两侧的葡萄糖浓 度；维持细胞内、外相等的葡萄糖水平 GLUT3    神经元神经元的葡萄糖转运 GLUT4    骨骼肌、心肌和脂肪组织介导葡萄糖向肌细胞和脂肪细胞的单向转运 GLUT5 ",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 54,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 54,
+        "end": 58
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb032",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 19 形成钠泵的一个转运周期。因此，钠泵每分 解一分子 ATP可逆浓度差将 3 个 Na + 移出 胞外，将2个K + 移入胞内，其直接效应是维 持细胞膜两侧 Na + 和K + 的浓度差，使细胞外 液中的 Na + 浓度达到胞质内的 10 倍左右，细 胞内的 K + 浓度达到细胞外液的 30 倍左右。 同时，钠泵每次活动都会使 3 个 Na + 移出胞 外、2个K + 移",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 58,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 58,
+        "end": 62
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb033",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 20 H + - ATP 酶，也称氢泵。氢泵不依赖 K + ，可 将 H + 由胞质内转运至溶酶体、内涵体、高尔基体（又称高尔 基复合体）、内质网、突触囊泡等细胞器内，以维持胞质的中性和细胞器内的酸性，使不同部位的酶都处 于最适 pH 环境，同时也建立起跨细胞器膜的 H + 浓度梯度，为溶质的跨细胞器膜转运提供动力。 2.   继发性主动转运  某些物质的主动转运不直接来自",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 62,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 62,
+        "end": 66
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb034",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 21 时，储存于细胞内的大量分泌囊泡与细胞膜融合，并将囊泡内容物排出细胞的过程，如动作电位到达 神经末梢时引起的神经递质释放。 2.  入胞  入胞作用（endocytosis）是指细胞外大分子物质或物质团块如细菌、死亡细胞和细胞碎 片等被细胞膜包裹后以囊泡形式进入细胞的过程，也称内化（internalization）。进入细胞后的囊泡随 即被溶酶体处理。与出胞相反，入胞可",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 66,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 66,
+        "end": 67
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb035",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 22 第二节 | 细胞的信号转导 一、 信号转导概述 （一）  信号转导的概念 细胞的信号转导（signal transduction）是指生物学信息（兴奋或抑制）在细胞间或细胞内转换和 传递，并产生生物效应的过程，通常指跨膜信号转导（transmembrane signal transduction），即生物活性 物质（激素、神经递质、细胞因子等）通过受体或离子通道的作用",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 67,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 67,
+        "end": 68
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb036",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 23 子通道型受体、G 蛋白耦联受体、酶联型受体和招募型受体介导的信号转导。另一类是脂溶性配体通 过单纯扩散进入细胞内，直接与胞质受体或核受体结合而发挥作用，通常都通过影响基因表达而产生 效应，称为核受体介导的信号转导。应当指出的是，大部分膜受体介导的信号转导通路亦可改变转录 因子活性而影响基因表达。 研究发现，细胞还可以主动向胞外分泌外泌体（exosome），通过直接与受",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 68,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 68,
+        "end": 69
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb037",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 24 （一）  主要的信号蛋白和第二信使 1.  G 蛋白耦联受体  GPCR 分布广泛，是膜受体中最大的家族，目前已知的有 1 000 多种，而人 类基因组中已知编码该类受体的基因约有 2 000 个。激活这类受体的配体也种类繁多，如儿茶酚胺、 5 -  羟色胺、乙酰胆碱、氨基酸类神经递质以及几乎所有的多肽和蛋白质类神经递质和 /  或激素（利尿 钠肽家族除外），还有光子",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 69,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 69,
+        "end": 72
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb038",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 25 第二信使还有三磷酸肌醇（inositol triphosphate，IP 3 ）、二酰甘油（diacylglycerol，DG）、环磷酸鸟苷（cyclic  guanosine monophosphate，cGMP）、Ca 2+ 、花生四烯酸（arachidonic acid，AA）及其代谢产物等。第二信使 可进一步通过激活蛋白激酶，产生以靶蛋白磷酸化和构象变化为特征",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 72,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 72,
+        "end": 73
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb039",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 26 channel，HCN）；也可通过 cAMP 激活的交换蛋白（exchange protein activated by cAMP，EPAC）激活 Ras 相关蛋白（Rap）介导的非 cAMP - PKA 通路等，调节细胞的功能。 2.  受体  - G 蛋白  - PLC - IP 3 - Ca 2+ 和 DG - PKC 通路 这一通路的关键信使分子是 IP 3 ",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 73,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 73,
+        "end": 77
+      }
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb040",
+      "name": "第二章 细胞的基本功能",
+      "definition": "第二章 细胞的基本功能 27 配体的信号转导。 （一）  酪氨酸激酶受体和酪氨酸激酶结合型受体 酪氨酸激酶受体（tyrosine kinase receptor，TKR）也称为受体酪氨酸激酶（receptor tyrosine kinase， RTK），其特征是胞内结构域具有酪氨酸激酶活性。激活这类受体的配体主要是各种生长因子。其下 游蛋白质的酪氨酸残基被磷酸化后，可以直接改变细胞功能或触发其下游",
+      "category": "核心概念",
+      "chapter": "第二章 细胞的基本功能",
+      "page": 77,
+      "textbookId": "87a69bec-ab57-4f3e-af78-8208444e0269",
+      "isTocNode": true,
+      "pageRange": {
+        "start": 77,
+        "end": 79
+      }
+    }
+  ],
+  "relations": [
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb001",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb002",
+      "relationType": "prerequisite",
+      "description": "第一章  绪论1 → 第二章  细胞的基本功能13"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb002",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb003",
+      "relationType": "prerequisite",
+      "description": "第二章  细胞的基本功能13 → 第三章  血液53"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb003",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb004",
+      "relationType": "prerequisite",
+      "description": "第三章  血液53 → 第四章  血液循环79"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb004",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb005",
+      "relationType": "prerequisite",
+      "description": "第四章  血液循环79 → 第五章  呼吸135"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb005",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb006",
+      "relationType": "prerequisite",
+      "description": "第五章  呼吸135 → 第六章  消化和吸收165"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb006",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb007",
+      "relationType": "prerequisite",
+      "description": "第六章  消化和吸收165 → 第七章  能量代谢与体温196"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb007",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb008",
+      "relationType": "prerequisite",
+      "description": "第七章  能量代谢与体温196 → 第八章  尿的生成和排出213"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb008",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb009",
+      "relationType": "prerequisite",
+      "description": "第八章  尿的生成和排出213 → 第九章  感觉器官的功能242"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb009",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb010",
+      "relationType": "prerequisite",
+      "description": "第九章  感觉器官的功能242 → 第十章  神经系统的功能280"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb010",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb011",
+      "relationType": "prerequisite",
+      "description": "第十章  神经系统的功能280 → 第十一章  内分泌337"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb011",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb012",
+      "relationType": "prerequisite",
+      "description": "第十一章  内分泌337 → 第十二章  生殖383"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb012",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb013",
+      "relationType": "prerequisite",
+      "description": "第十二章  生殖383 → 第十三章  生长发育和衰老400"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb013",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb014",
+      "relationType": "prerequisite",
+      "description": "第十三章  生长发育和衰老400 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb014",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb015",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb015",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb016",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb016",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb017",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb017",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb018",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb018",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb019",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb019",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb020",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb020",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb021",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb021",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb022",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb022",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb023",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb023",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb024",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb024",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb025",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第一章 绪论"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb025",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb026",
+      "relationType": "prerequisite",
+      "description": "第一章 绪论 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb026",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb027",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb027",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb028",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb028",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb029",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb029",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb030",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb030",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb031",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb031",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb032",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb032",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb033",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb033",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb034",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb034",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb035",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb035",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb036",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb036",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb037",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb037",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb038",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb038",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb039",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    },
+    {
+      "source": "87a69bec-ab57-4f3e-af78-8208444e0269_fb039",
+      "target": "87a69bec-ab57-4f3e-af78-8208444e0269_fb040",
+      "relationType": "prerequisite",
+      "description": "第二章 细胞的基本功能 → 第二章 细胞的基本功能"
+    }
+  ],
+  "tocStructure": [
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb001",
+      "name": "第一章  绪论1",
+      "pageStart": 12,
+      "pageEnd": 15,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb002",
+      "name": "第二章  细胞的基本功能13",
+      "pageStart": 15,
+      "pageEnd": 16,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb003",
+      "name": "第三章  血液53",
+      "pageStart": 16,
+      "pageEnd": 17,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb004",
+      "name": "第四章  血液循环79",
+      "pageStart": 17,
+      "pageEnd": 19,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb005",
+      "name": "第五章  呼吸135",
+      "pageStart": 19,
+      "pageEnd": 20,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb006",
+      "name": "第六章  消化和吸收165",
+      "pageStart": 20,
+      "pageEnd": 23,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb007",
+      "name": "第七章  能量代谢与体温196",
+      "pageStart": 23,
+      "pageEnd": 24,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb008",
+      "name": "第八章  尿的生成和排出213",
+      "pageStart": 24,
+      "pageEnd": 26,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb009",
+      "name": "第九章  感觉器官的功能242",
+      "pageStart": 26,
+      "pageEnd": 28,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb010",
+      "name": "第十章  神经系统的功能280",
+      "pageStart": 28,
+      "pageEnd": 30,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb011",
+      "name": "第十一章  内分泌337",
+      "pageStart": 30,
+      "pageEnd": 32,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb012",
+      "name": "第十二章  生殖383",
+      "pageStart": 32,
+      "pageEnd": 33,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb013",
+      "name": "第十三章  生长发育和衰老400",
+      "pageStart": 33,
+      "pageEnd": 34,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb014",
+      "name": "第一章 绪论",
+      "pageStart": 34,
+      "pageEnd": 35,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb015",
+      "name": "第一章 绪论",
+      "pageStart": 35,
+      "pageEnd": 36,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb016",
+      "name": "第一章 绪论",
+      "pageStart": 36,
+      "pageEnd": 37,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb017",
+      "name": "第一章 绪论",
+      "pageStart": 37,
+      "pageEnd": 38,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb018",
+      "name": "第一章 绪论",
+      "pageStart": 38,
+      "pageEnd": 39,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb019",
+      "name": "第一章 绪论",
+      "pageStart": 39,
+      "pageEnd": 40,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb020",
+      "name": "第一章 绪论",
+      "pageStart": 40,
+      "pageEnd": 41,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb021",
+      "name": "第一章 绪论",
+      "pageStart": 41,
+      "pageEnd": 42,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb022",
+      "name": "第一章 绪论",
+      "pageStart": 42,
+      "pageEnd": 44,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb023",
+      "name": "第一章 绪论",
+      "pageStart": 44,
+      "pageEnd": 45,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb024",
+      "name": "第一章 绪论",
+      "pageStart": 45,
+      "pageEnd": 46,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb025",
+      "name": "第一章 绪论",
+      "pageStart": 46,
+      "pageEnd": 47,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb026",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 47,
+      "pageEnd": 48,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb027",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 48,
+      "pageEnd": 49,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb028",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 49,
+      "pageEnd": 51,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb029",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 51,
+      "pageEnd": 52,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb030",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 52,
+      "pageEnd": 54,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb031",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 54,
+      "pageEnd": 58,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb032",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 58,
+      "pageEnd": 62,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb033",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 62,
+      "pageEnd": 66,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb034",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 66,
+      "pageEnd": 67,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb035",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 67,
+      "pageEnd": 68,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb036",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 68,
+      "pageEnd": 69,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb037",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 69,
+      "pageEnd": 72,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb038",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 72,
+      "pageEnd": 73,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb039",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 73,
+      "pageEnd": 77,
+      "parentId": null,
+      "level": 1
+    },
+    {
+      "id": "87a69bec-ab57-4f3e-af78-8208444e0269_fb040",
+      "name": "第二章 细胞的基本功能",
+      "pageStart": 77,
+      "pageEnd": 79,
+      "parentId": null,
+      "level": 1
+    }
+  ]
+}

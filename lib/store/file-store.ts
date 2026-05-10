@@ -4,34 +4,99 @@ import { Store } from "./types";
 import { NS } from "./key-namespace";
 import { Textbook, TOCGraph, KnowledgeGraph } from "@/types";
 
-const DATA_DIR = path.join(process.cwd(), ".data");
+// On Vercel: /tmp is the only writable directory
+// Repo .data/ ships pre-loaded knowledge graphs (read-only on Vercel)
+const WRITE_DIR = process.env.VERCEL
+  ? path.join("/tmp", ".data")
+  : path.join(process.cwd(), ".data");
+const REPO_DATA_DIR = path.join(process.cwd(), ".data");
+
+let seeded = false;
+
+/** Copy pre-loaded .data/ files from repo into /tmp on Vercel cold start */
+async function seed(): Promise<void> {
+  if (seeded) return;
+  seeded = true;
+  if (!process.env.VERCEL) return;
+  try {
+    const entries = await fs.readdir(REPO_DATA_DIR);
+    await fs.mkdir(WRITE_DIR, { recursive: true }).catch(() => {});
+    for (const entry of entries) {
+      if (entry.endsWith(".bin")) continue; // skip large PDF buffers
+      const src = path.join(REPO_DATA_DIR, entry);
+      const dst = path.join(WRITE_DIR, entry);
+      try {
+        await fs.stat(dst); // already copied
+      } catch {
+        await fs.copyFile(src, dst);
+        console.log(`[store] seeded ${entry}`);
+      }
+    }
+  } catch { /* repo .data/ may not exist yet */ }
+}
 
 async function ensureDir(): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true }).catch(() => {});
+  await seed();
+  await fs.mkdir(WRITE_DIR, { recursive: true }).catch(() => {});
 }
 
-function filePath(key: string): string {
-  return path.join(DATA_DIR, `${encodeURIComponent(key)}.json`);
+function writePath(key: string): string {
+  return path.join(WRITE_DIR, `${encodeURIComponent(key)}.json`);
 }
 
+/** Try to read from write dir first, fall back to repo dir (pre-loaded) */
 async function readJson<T>(key: string): Promise<T | null> {
+  await seed();
+  // Try write dir first (latest data)
   try {
-    const raw = await fs.readFile(filePath(key), "utf-8");
+    const raw = await fs.readFile(writePath(key), "utf-8");
     return JSON.parse(raw) as T;
-  } catch {
-    return null;
+  } catch {}
+  // Fallback: repo dir (shipped with deployment)
+  if (process.env.VERCEL) {
+    try {
+      const repoPath = path.join(REPO_DATA_DIR, `${encodeURIComponent(key)}.json`);
+      const raw = await fs.readFile(repoPath, "utf-8");
+      return JSON.parse(raw) as T;
+    } catch {}
   }
+  return null;
 }
 
 async function writeJson(key: string, data: unknown): Promise<void> {
   await ensureDir();
-  await fs.writeFile(filePath(key), JSON.stringify(data, null, 2), "utf-8");
+  await fs.writeFile(writePath(key), JSON.stringify(data, null, 2), "utf-8");
 }
 
 async function removeJson(key: string): Promise<void> {
+  await seed();
+  try { await fs.unlink(writePath(key)); } catch {}
+  // Also remove from repo dir if it exists there
+  if (process.env.VERCEL) {
+    try { await fs.unlink(path.join(REPO_DATA_DIR, `${encodeURIComponent(key)}.json`)); } catch {}
+  }
+}
+
+async function listKeys(prefix: string): Promise<string[]> {
+  await ensureDir();
+  const keys: string[] = [];
+  // Write dir
   try {
-    await fs.unlink(filePath(key));
-  } catch { /* missing file is fine */ }
+    const entries = await fs.readdir(WRITE_DIR);
+    for (const e of entries) {
+      if (e.startsWith(prefix)) keys.push(e);
+    }
+  } catch {}
+  // Repo dir (dedup)
+  if (process.env.VERCEL) {
+    try {
+      const entries = await fs.readdir(REPO_DATA_DIR);
+      for (const e of entries) {
+        if (e.startsWith(prefix) && !keys.includes(e)) keys.push(e);
+      }
+    } catch {}
+  }
+  return keys;
 }
 
 export class FileStore implements Store {
@@ -43,10 +108,9 @@ export class FileStore implements Store {
   }
   async listTextbooks(): Promise<Textbook[]> {
     await ensureDir();
-    const entries = await fs.readdir(DATA_DIR);
     const textbooks: Textbook[] = [];
-    for (const entry of entries) {
-      if (!entry.startsWith("textbook%3A")) continue;
+    const keys = await listKeys("textbook%3A");
+    for (const entry of keys) {
       const key = decodeURIComponent(entry.replace(/\.json$/, ""));
       const tb = await readJson<Textbook>(key);
       if (tb) textbooks.push(tb);
@@ -76,11 +140,9 @@ export class FileStore implements Store {
   async listDrillKeys(textbookId: string): Promise<string[]> {
     await ensureDir();
     const prefix = `drill%3A${textbookId}%3A`;
-    const entries = await fs.readdir(DATA_DIR);
+    const entries = await listKeys(prefix);
     return entries
-      .filter((e) => e.startsWith(prefix))
       .map((e) => {
-        // drill%3A{textbookId}%3A{chapterId}.json → chapterId
         const rest = decodeURIComponent(e.replace(/\.json$/, ""));
         return rest.slice(`drill:${textbookId}:`.length);
       });
@@ -88,18 +150,17 @@ export class FileStore implements Store {
   async deleteDrillGraphs(textbookId: string) {
     await ensureDir();
     const prefix = `drill%3A${textbookId}%3A`;
-    const entries = await fs.readdir(DATA_DIR);
+    const entries = await listKeys(prefix);
     for (const entry of entries) {
-      if (entry.startsWith(prefix)) {
-        await fs.unlink(path.join(DATA_DIR, entry));
-      }
+      await fs.unlink(path.join(WRITE_DIR, entry)).catch(() => {});
     }
   }
 
   async getPdfBuffer(textbookId: string): Promise<Buffer | null> {
+    await seed();
     try {
       return await fs.readFile(
-        path.join(DATA_DIR, `${encodeURIComponent(NS.pdfBuffer(textbookId))}.bin`),
+        path.join(WRITE_DIR, `${encodeURIComponent(NS.pdfBuffer(textbookId))}.bin`),
       );
     } catch {
       return null;
@@ -108,16 +169,16 @@ export class FileStore implements Store {
   async setPdfBuffer(textbookId: string, buffer: Buffer) {
     await ensureDir();
     await fs.writeFile(
-      path.join(DATA_DIR, `${encodeURIComponent(NS.pdfBuffer(textbookId))}.bin`),
+      path.join(WRITE_DIR, `${encodeURIComponent(NS.pdfBuffer(textbookId))}.bin`),
       buffer,
     );
   }
   async deletePdfBuffer(textbookId: string) {
     try {
       await fs.unlink(
-        path.join(DATA_DIR, `${encodeURIComponent(NS.pdfBuffer(textbookId))}.bin`),
+        path.join(WRITE_DIR, `${encodeURIComponent(NS.pdfBuffer(textbookId))}.bin`),
       );
-    } catch { /* missing file is fine */ }
+    } catch {}
   }
 
   async getTextbookIdByHash(sha256: string) {
