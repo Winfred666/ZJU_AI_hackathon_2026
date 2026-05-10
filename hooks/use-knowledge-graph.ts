@@ -57,11 +57,36 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     } catch { /* silent */ }
   },
 
-  selectTextbook: (id) =>
-    set((s) => {
-      const graph = id ? s.graphs[id] ?? null : null;
-      return { currentTextbookId: id, knowledgeGraph: graph, ragReady: false };
-    }),
+  selectTextbook: async (id) => {
+    if (!id) {
+      set({ currentTextbookId: null, knowledgeGraph: null, ragReady: false });
+      return;
+    }
+    const s = get();
+    // Graph cached from upload — use immediately
+    if (s.graphs[id]) {
+      set({ currentTextbookId: id, knowledgeGraph: s.graphs[id], ragReady: false });
+      return;
+    }
+    // Load graph on demand (e.g. after page refresh from persistent store)
+    set({ currentTextbookId: id, knowledgeGraph: null, ragReady: false, isLoading: true });
+    try {
+      const res = await fetch(`/api/knowledge/${id}`);
+      const data = await res.json();
+      if (data.tocGraph) {
+        const graph = { nodes: data.tocGraph.nodes, relations: data.tocGraph.relations };
+        set((prev) => ({
+          graphs: { ...prev.graphs, [id]: graph },
+          knowledgeGraph: prev.currentTextbookId === id ? graph : prev.knowledgeGraph,
+          isLoading: false,
+        }));
+      } else {
+        set({ isLoading: false });
+      }
+    } catch {
+      set({ isLoading: false });
+    }
+  },
 
   setTOCGraph: (textbookId, tocGraph) =>
     set((s) => {
