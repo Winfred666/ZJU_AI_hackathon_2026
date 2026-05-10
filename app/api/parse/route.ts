@@ -9,7 +9,7 @@ export const tocGraphStore = new Map<string, TOCGraph>();
 export const pdfBufferStore = new Map<string, Buffer>();
 
 const TINY_FILE_BYTES = 50_000;
-const TOC_PREVIEW_PAGES = 25; // enough to reach TOC in most textbooks (commonly p10-20)
+const TOC_PREVIEW_PAGES = 20;
 const FALLBACK_PAGES = 20;
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -99,7 +99,7 @@ async function handlePdf(
     const previewN = Math.min(TOC_PREVIEW_PAGES, totalPages);
     console.log(`[parse] ${title} — reading first ${previewN} pages for TOC`);
     const previewText = await readPages(doc, 1, previewN, title);
-    const { tocText, pageRange } = extractTOC(previewText, previewN);
+    const { tocText, pageRange } = extractTOC(previewText, totalPages);
 
     if (tocText) {
       console.log(`[parse] ${title} — TOC found p${pageRange?.start}-${pageRange?.end}`);
