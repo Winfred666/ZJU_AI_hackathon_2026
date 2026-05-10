@@ -2,8 +2,8 @@
 
 import { Textbook, ParseStatus } from "@/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, CheckCircle, XCircle, BookOpen, BookMarked, ScanText } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { FileText, CheckCircle, XCircle, BookOpen, BookMarked, ScanText, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils/utils";
 import { useState } from "react";
 
 const statusIcon: Record<ParseStatus, React.ReactNode> = {
@@ -19,14 +19,17 @@ export function FileList({
   selectedId,
   onSelect,
   onMerge,
+  onDelete,
 }: {
   textbooks: Textbook[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   onMerge?: (sourceId: string, targetId: string) => void;
+  onDelete?: (id: string) => void;
 }) {
   const [dragSource, setDragSource] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   if (textbooks.length === 0) {
     return (
@@ -107,6 +110,32 @@ export function FileList({
               </div>
               {statusIcon[tb.status]}
             </button>
+
+            {/* Delete button — appears on hover */}
+            {onDelete && (
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  setDeleting(tb.textbookId);
+                  await onDelete(tb.textbookId);
+                  setDeleting(null);
+                }}
+                disabled={deleting === tb.textbookId}
+                className={cn(
+                  "absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-1 opacity-0 transition-all",
+                  "group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive",
+                  "focus-visible:opacity-100",
+                  deleting === tb.textbookId && "opacity-100 animate-pulse",
+                )}
+                aria-label={`删除 ${tb.title}`}
+              >
+                {deleting === tb.textbookId ? (
+                  <span className="block size-3 rounded-full border-2 border-destructive border-t-transparent animate-spin" />
+                ) : (
+                  <Trash2 className="size-3.5" />
+                )}
+              </button>
+            )}
 
             {/* Hover tooltip for non-full status */}
             {tb.status !== "full" && tb.status !== "merged" && (

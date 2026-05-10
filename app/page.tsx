@@ -30,12 +30,12 @@ export default function HomePage() {
         const buf = await file.arrayBuffer();
         const hash = await sha256Browser(buf);
 
-        const checkRes = await fetch(`/api/files/check?hash=${encodeURIComponent(hash)}`);
+        const checkRes = await fetch(`/api/files/check?hash=${encodeURIComponent(hash)}&filename=${encodeURIComponent(file.name)}`);
         const checkData = await checkRes.json();
 
         if (checkData.found && checkData.textbook) {
           // File already parsed — use cached data, no upload needed
-          console.log(`[upload] ${file.name} — SKIP (cached, ${hash.slice(0, 8)}...)`);
+          console.log(`[upload] ${file.name} — SKIP (matched by ${checkData.matchBy}, ${hash.slice(0, 8)}...)`);
           addTextbooks([checkData.textbook as Textbook]);
           if (checkData.tocGraph) {
             setTOCGraph(checkData.textbook.textbookId, checkData.tocGraph as TOCGraph);
@@ -165,6 +165,7 @@ export default function HomePage() {
               selectedId={currentTextbookId}
               onSelect={handleSelectTextbook}
               onMerge={handleMerge}
+              onDelete={removeTextbook}
             />
           </div>
         </aside>
