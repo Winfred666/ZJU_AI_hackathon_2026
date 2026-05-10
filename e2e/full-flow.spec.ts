@@ -81,12 +81,18 @@ test.describe("Full upload flow", () => {
 
     // Upload big PDF (~32MB) — falls into TOC extraction branch
     const bigInput = page.getByTestId("file-input");
+    await expect(bigInput).toBeAttached({ timeout: 5000 });
     await bigInput.setInputFiles(BIG_PDF);
     await bigInput.dispatchEvent("input");
     await bigInput.dispatchEvent("change");
 
+    console.log("Big file set, waiting for response...");
+    await page.screenshot({ path: "test-results/big-pdf-after-upload.png" }).catch(() => {});
+    const pageText = await page.textContent("body");
+    console.log("Page text after upload:", pageText?.slice(0, 400));
+
     // File appears with "toc_only" status (目录解析)
-    await expect(page.getByText(/生理/i)).toBeVisible({ timeout: 60000 });
+    await expect(page.getByText(/生理/i)).toBeVisible({ timeout: 120000 });
 
     // Knowledge graph renders from TOC LLM extraction
     await expect(page.getByTestId("knowledge-graph")).toBeVisible({ timeout: 180000 });

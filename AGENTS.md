@@ -6,27 +6,28 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # PDF 上传解析策略
 
-所有 PDF 解析发生在 `app/api/parse/route.ts`，核心原则：**只向 OpenAI API 上传解析后的文字，永不上传原始 PDF 二进制**。
+**PDF 库**: `pdf-parse@1.1.1`（Node.js 兼容，无需 DOM API，非 pdfjs-dist 直调）  
+**核心原则**: 只向 OpenAI API 上传解析后的文字，永不上传原始 PDF 二进制  
+**架构参考**: agentset 使用外部 Partition API 服务，本项目因无外部服务，采用本地 pdf-parse
 
 ## 分档解析逻辑
 
 | 条件 | 策略 | 状态 |
 |------|------|------|
-| 文件 < 50KB **或** 页数 ≤ 10 | 全文解析，发送前 30,000 字符给 LLM | `full` |
-| 文件 ≥ 50KB **且** 前 25 页找到目录 | 仅提取目录文字，发送给 LLM 生成章节关系图 | `toc_only` |
-| 文件 ≥ 50KB **且** 前 25 页无目录 | 仅解析前 20 页，发送给 LLM | `partial` |
+| 文件 < 50KB | pdf-parse 全文解析，发送前 30,000 字符给 LLM | `full` |
+| 文件 ≥ 50KB **且** 找到目录 | pdf-parse 全文解析，仅发送目录文字给 LLM | `toc_only` |
+| 文件 ≥ 50KB **且** 无目录 | pdf-parse 全文解析，发送前 15,000 字符给 LLM | `partial` |
 
 ## 目录识别
 
-在 PDF 前 25% 页面中搜索 `目录` / `目次` / `Contents` 标记，找到后向下搜索第一个章节标题（`第X章`）或 `前言`/`绪论`/`引言` 作为目录结束边界。未找到结束标记时假定目录占 4 页。
+全文解析后在文本前 25% 中搜索 `目录` / `目次` / `Contents` 标记，找到后向下搜索第一个章节标题（`第X章`）或 `前言`/`绪论`/`引言` 作为目录结束边界。
 
 ## LLM 调用加速
 
-- 目录文字上限 50,000 字符
-- 正文文字上限 30,000 字符  
-- 每次 LLM 调用仅发送纯文本，不携带 PDF 二进制或 base64
-- 大文件跳过逐页全量解析，仅读取所需页面范围
-
+- 目录/正文文字上限 30,000 字符  
+- 每次 LLM 调用仅发送纯文本
+- 大文件仅发送目录或预览文字，不发送全文
+  
 ## PDF 页面按需提取
 
 原始 PDF buffer 缓存在 `pdfBufferStore`，双击知识图谱节点时由 `app/api/knowledge/drill/route.ts` 按需读取指定页码范围，解析后发送文字到 LLM。

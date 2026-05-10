@@ -9,8 +9,6 @@ export const tocGraphStore = new Map<string, TOCGraph>();
 export const pdfBufferStore = new Map<string, Buffer>();
 
 const TINY_FILE_BYTES = 50_000;
-const TOC_PREVIEW_PAGES = 20;
-const FALLBACK_PAGES = 20;
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
@@ -78,41 +76,35 @@ async function handlePdf(
   title: string,
 ): Promise<{ textbook: Textbook; tocGraph?: TOCGraph | null }> {
   try {
-    console.log(`[parse] ${title} (${(fileBytes / 1024).toFixed(0)}KB) — loading PDF`);
-    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-    const doc = await pdfjs.getDocument({ data: new Uint8Array(buffer) }).promise;
-    const totalPages = doc.numPages;
-    console.log(`[parse] ${title} — ${totalPages} pages`);
+    console.log(`[parse] ${title} (${(fileBytes / 1024).toFixed(0)}KB) — parsing PDF`);
 
-    // Store buffer for drill-down
+    const pdfParse = (await import("pdf-parse")).default;
+    const data = await pdfParse(buffer);
+    const fullText = data.text as string;
+    const totalPages = data.numpages;
+    console.log(`[parse] ${title} — ${totalPages}p, ${(fullText.length / 1000).toFixed(0)}k chars`);
+
     pdfBufferStore.set(textbookId, buffer);
 
-    // Tiny file or short doc: parse all pages
-    if (fileBytes < TINY_FILE_BYTES || totalPages <= 10) {
-      console.log(`[parse] ${title} — full parse (${totalPages} pages)`);
-      const fullText = await readPages(doc, 1, totalPages, title);
+    // Tiny file: full text to LLM
+    if (fileBytes < TINY_FILE_BYTES) {
       return buildResult(textbookId, title, fileBytes, totalPages, fullText, "full",
         `全文解析完成 (${(fileBytes / 1024).toFixed(0)}KB)`);
     }
 
-    // Large file: read first N pages for TOC
-    const previewN = Math.min(TOC_PREVIEW_PAGES, totalPages);
-    console.log(`[parse] ${title} — reading first ${previewN} pages for TOC`);
-    const previewText = await readPages(doc, 1, previewN, title);
-    const { tocText, pageRange } = extractTOC(previewText, totalPages);
+    // Large file: search for TOC, only send TOC text to LLM
+    const { tocText, pageRange } = extractTOC(fullText, totalPages);
 
     if (tocText) {
       console.log(`[parse] ${title} — TOC found p${pageRange?.start}-${pageRange?.end}`);
-      return buildResult(textbookId, title, fileBytes, totalPages, previewText, "toc_only",
+      return buildResult(textbookId, title, fileBytes, totalPages, fullText, "toc_only",
         `目录已解析 · 共${totalPages}页`, tocText, pageRange);
     }
 
-    // TOC not found: fallback
-    const fallbackN = Math.min(FALLBACK_PAGES, totalPages);
-    console.log(`[parse] ${title} — TOC not found, reading first ${fallbackN} pages`);
-    const firstNText = await readPages(doc, 1, fallbackN, title);
-    return buildResult(textbookId, title, fileBytes, totalPages, firstNText, "partial",
-      `已解析前 ${fallbackN}/${totalPages} 页`);
+    // TOC not found: send first ~15k chars to LLM
+    const preview = fullText.slice(0, 15_000);
+    return buildResult(textbookId, title, fileBytes, totalPages, fullText, "partial",
+      `已解析前 15,000 字 / ${(fullText.length / 1000).toFixed(0)}k 字`);
   } catch (err) {
     console.error(`[parse] ${title} — ERROR:`, err);
     return { textbook: makeError(textbookId, title, `PDF 解析失败: ${String(err)}`) };
@@ -121,37 +113,25 @@ async function handlePdf(
 
 async function buildResult(
   textbookId: string, title: string, fileBytes: number, totalPages: number,
-  text: string, status: Textbook["status"], statusDetail: string,
+  fullText: string, status: Textbook["status"], statusDetail: string,
   tocText?: string, pageRange?: { start: number; end: number } | null,
 ): Promise<{ textbook: Textbook; tocGraph?: TOCGraph | null }> {
-  const chapters = extractChapters(text, textbookId);
+  const chapters = extractChapters(fullText, textbookId);
   const tb: Textbook = {
-    textbookId, filename: title, title, totalPages, totalChars: text.length,
+    textbookId, filename: title, title, totalPages, totalChars: fullText.length,
     chapters, tocText: tocText ?? "", tocPageRange: pageRange ?? null,
     status, statusDetail, uploadedAt: Date.now(),
   };
   textbookStore.set(textbookId, tb);
 
+  const llmInput = (tocText ?? fullText).slice(0, 30_000);
+  console.log(`[parse] ${title} — LLM (${llmInput.length} chars)`);
   const cpm = chapters.map((c) => ({ title: c.title, pageStart: c.pageStart, pageEnd: c.pageEnd }));
-  const llmInput = (tocText ?? text).slice(0, 30_000);
-  console.log(`[parse] ${title} — LLM call (${llmInput.length} chars)`);
+  const t0 = performance.now();
   const tg = await extractTOCGraph(llmInput, textbookId, cpm);
-  console.log(`[parse] ${title} — done, ${tg?.nodes.length ?? 0} nodes`);
+  console.log(`[parse] ${title} — LLM ${((performance.now() - t0) / 1000).toFixed(1)}s, ${tg?.nodes.length ?? 0} nodes`);
   if (tg) tocGraphStore.set(textbookId, tg);
   return { textbook: tb, tocGraph: tg };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function readPages(doc: any, start: number, end: number, label: string): Promise<string> {
-  const max = Math.min(end, doc.numPages);
-  const pages: string[] = [];
-  for (let i = start; i <= max; i++) {
-    const page = await doc.getPage(i);
-    const content = await page.getTextContent();
-    pages.push(content.items.map((item: { str?: string }) => ("str" in item ? item.str : "")).join(" "));
-    if (i % 5 === 0) console.log(`[parse] ${label} — page ${i}/${max}`);
-  }
-  return pages.join("\n");
 }
 
 function makeError(id: string, filename: string, msg: string): Textbook {

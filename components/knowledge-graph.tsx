@@ -5,7 +5,6 @@ import { KnowledgeGraph as KG, KnowledgeNode } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 // G6 v5.1.1 calls console.error internally during destroy() with
 // "[G6 …] The graph instance has been destroyed". This fires harmlessly
@@ -77,17 +76,48 @@ export function KnowledgeGraphView({
 
       const G6Graph = mod.Graph as any;
 
+      // Calculate container dimensions for initial random scatter
+      const width = containerRef.current?.clientWidth || 800;
+      const height = containerRef.current?.clientHeight || 600;
+
       const g = new G6Graph({
         container: containerRef.current!,
         autoFit: "view",
         data: {
           nodes: graph.nodes.map((n) => ({
             id: n.id,
+            // Smaller initial scatter area (200x200) to prevent sparseness
+            style: {
+              x: (Math.random() - 0.5) * 200 + width / 2,
+              y: (Math.random() - 0.5) * 200 + height / 2,
+              size: 24,
+              fill: theme.nodeFill,
+              stroke: theme.nodeFill,
+              labelText: n.name,
+              labelPlacement: "bottom",
+              labelFontSize: 10,
+              labelFill: theme.nodeLabel,
+              labelFontWeight: "500",
+              labelOffsetY: 4,
+            },
             data: { label: n.name, category: n.category },
           })),
           edges: graph.relations.map((r) => ({
             source: r.source,
             target: r.target,
+            style: {
+              stroke: theme.edgeStroke,
+              endArrow: true,
+              lineWidth: 1,
+              labelText: r.relationType === "prerequisite" ? "前置" : "包含",
+              labelFill: theme.edgeLabel,
+              labelFontSize: 9,
+              labelBackground: true,
+              labelBackgroundFill: "#fff",
+              labelBackgroundOpacity: 0.9,
+              labelBackgroundRadius: 4,
+              labelPadding: [2, 4],
+            },
             data: {
               label: r.relationType === "prerequisite" ? "前置" : "包含",
               relationType: r.relationType,
@@ -95,46 +125,24 @@ export function KnowledgeGraphView({
           })),
         },
         layout: {
-          type: "force",
-          linkDistance: 180,
-          nodeStrength: -2000,
-          edgeStrength: 0.1,
-          preventOverlap: true,
-          nodeSize: 40, // Larger virtual size for overlap prevention (node is 24)
-          velocityDecay: 0.3, 
-          alphaDecay: 0.05,
+          type: "d3-force",
+          linkDistance: 80,
+          manyBody: {
+            strength: -80, // Lower repulsion
+            distanceMax: 300,
+          },
+          collide: {
+            radius: 30,
+            strength: 0.7,
+          },
+          velocityDecay: 0.2,
+          alphaDecay: 0.03,
           animate: true,
         },
         node: {
-          style: {
-            size: 24,
-            fill: theme.nodeFill,
-            stroke: theme.nodeFill,
-            labelText: (d: { data?: { label?: string } }) => d.data?.label ?? "",
-            labelPlacement: "bottom",
-            labelFontSize: 10,
-            labelFill: theme.nodeLabel,
-            labelFontWeight: "500",
-            labelOffsetY: 4,
-          },
           state: {
             active: { halo: true, haloFill: theme.nodeFill, haloOpacity: 0.15 },
             selected: { stroke: theme.nodeFill, lineWidth: 3 },
-          },
-        },
-        edge: {
-          style: {
-            stroke: theme.edgeStroke,
-            endArrow: true,
-            lineWidth: 1,
-            labelText: (d: { data?: { label?: string } }) => d.data?.label ?? "",
-            labelFill: theme.edgeLabel,
-            labelFontSize: 9,
-            labelBackground: true,
-            labelBackgroundFill: "#fff",
-            labelBackgroundOpacity: 0.9,
-            labelBackgroundRadius: 4,
-            labelPadding: [2, 4],
           },
         },
         behaviors: [
@@ -142,9 +150,7 @@ export function KnowledgeGraphView({
           "drag-canvas",
           {
             type: "drag-element",
-            enableTransient: true,
-            // In G6 v5, the layout automatically reacts to node position changes 
-            // if configured correctly, but we can nudge it for more "conductivity"
+            enableTransient: true, // Key for conductive drag
           },
           "hover-element",
           "click-element",
@@ -188,7 +194,7 @@ export function KnowledgeGraphView({
   }
 
   return (
-    <div className="relative size-full overflow-hidden rounded-xl">
+    <div className="relative size-full overflow-hidden rounded-xl bg-background/50">
       <div ref={containerRef} className="size-full" data-testid="knowledge-graph" />
       <Button
         variant="outline"

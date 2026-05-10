@@ -3,17 +3,17 @@ import { Chapter } from "@/types";
 const CHAPTER_REGEX = /^第[\d一二三四五六七八九十百千]+章\s*[^\n]*/m;
 
 // Patterns that signal a TOC page
+// Search for TOC markers within page text (no ^/$ — page text has no line breaks)
 const TOC_START_PATTERNS = [
-  /^\s*目\s*录\s*$/m,          // "目录" on its own line
-  /^\d{1,4}\s*目\s*录/,        // "15目录" — page number before 目录
-  /^\s*目\s*次\s*$/m,
-  /^\s*Contents\s*$/im,
+  /目\s*录/,           // "目录" or "目 录"
+  /目\s*次/,           // "目次"
+  /Contents/i,         // English
 ];
 const TOC_END_PATTERNS = [
   CHAPTER_REGEX,
-  /^\s*前\s*言\s*$/m,
-  /^\s*绪\s*论\s*$/m,
-  /^\s*引\s*言\s*$/m,
+  /前\s*言/,
+  /绪\s*论/,
+  /引\s*言/,
 ];
 // Minimum TOC content length (chars) — shorter = likely false positive
 const TOC_MIN_LENGTH = 80;
@@ -69,60 +69,47 @@ export function extractTOC(fullText: string, totalPages: number): {
   tocText: string;
   pageRange: { start: number; end: number } | null;
 } {
-  const lines = fullText.split("\n");
-  const linesPerPage = Math.max(1, Math.floor(lines.length / totalPages));
-  const searchLines = Math.floor(lines.length * 0.25);
+  // Each array element = one page of text (joined without spaces by readPages)
+  const pages = fullText.split("\n");
+  // Search all available pages (caller already limits how many pages to read)
+  const searchPages = pages.length;
 
-  let tocStartLine = -1;
-  let tocEndLine = -1;
-  let lastCandidateEnd = 0; // skip past false positives
+  let tocStartPage = -1;
+  let tocEndPage = -1;
 
-  for (let i = 0; i < searchLines; i++) {
-    if (i < lastCandidateEnd) continue; // skip past previous false positive
-
-    const line = lines[i].trim();
-    if (tocStartLine === -1) {
-      if (TOC_START_PATTERNS.some((p) => p.test(line))) {
-        tocStartLine = i;
+  for (let i = 0; i < searchPages; i++) {
+    const pageText = pages[i];
+    if (tocStartPage === -1) {
+      if (TOC_START_PATTERNS.some((p) => p.test(pageText))) {
+        tocStartPage = i;
       }
     } else {
-      // Scan forward to find end marker
-      let foundEnd = false;
-      let j = i;
-      for (; j < searchLines && j < tocStartLine + linesPerPage * 10; j++) {
-        if (TOC_END_PATTERNS.some((p) => p.test(lines[j].trim()))) {
-          tocEndLine = j;
-          foundEnd = true;
+      // Scan forward for end marker
+      for (let j = i; j < searchPages && j <= tocStartPage + 10; j++) {
+        if (TOC_END_PATTERNS.some((p) => p.test(pages[j]))) {
+          tocEndPage = j;
           break;
         }
       }
+      if (tocEndPage === -1) tocEndPage = tocStartPage + 5;
 
-      if (!foundEnd) {
-        tocEndLine = tocStartLine + linesPerPage * 4;
-      }
+      const candidateText = pages.slice(tocStartPage, tocEndPage + 1).join("\n").trim();
 
-      const candidateText = lines.slice(tocStartLine, tocEndLine).join("\n").trim();
-
-      // Validate: a real TOC has substantial content with chapter-like patterns
-      const hasChapterContent = CHAPTER_REGEX.test(candidateText) ||
-        /第[一二三四五六七八九十\d]+章/.test(candidateText);
+      // A real TOC has multiple chapter entries (not just a single mention)
+      const chapterMatches = candidateText.match(/第[一二三四五六七八九十\d]+章/g);
+      const hasMultipleChapters = chapterMatches !== null && chapterMatches.length >= 3;
       const isLongEnough = candidateText.length >= TOC_MIN_LENGTH;
 
-      if (hasChapterContent && isLongEnough) {
+      if (hasMultipleChapters && isLongEnough) {
         return {
           tocText: candidateText,
-          pageRange: {
-            start: Math.floor(tocStartLine / linesPerPage) + 1,
-            end: Math.ceil(tocEndLine / linesPerPage),
-          },
+          pageRange: { start: tocStartPage + 1, end: tocEndPage + 1 },
         };
       }
 
-      // False positive — reset and continue searching after this candidate
-      lastCandidateEnd = tocEndLine + 1;
-      tocStartLine = -1;
-      tocEndLine = -1;
-      i = j; // continue from where the end marker was found
+      // False positive — reset
+      tocStartPage = -1;
+      tocEndPage = -1;
     }
   }
 

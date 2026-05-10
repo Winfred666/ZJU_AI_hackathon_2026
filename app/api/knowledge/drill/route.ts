@@ -3,6 +3,7 @@ import { drillRequestSchema, drillOutputSchema } from "@/lib/validators";
 import { llmGenerate } from "@/lib/llm";
 import { KnowledgeGraph } from "@/types";
 import { pdfBufferStore } from "@/app/api/parse/route";
+import { extractPageRange } from "@/lib/pdf-parser";
 
 const MAX_CONTENT_BYTES = 900_000;
 
@@ -35,20 +36,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: "PDF 缓存已过期，请重新上传" }, { status: 404 });
     }
 
-    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const doc: any = await pdfjs.getDocument({ data: new Uint8Array(buffer) }).promise;
+    const pdfParse = (await import("pdf-parse")).default;
+    const data = await pdfParse(buffer);
+    const fullText = data.text as string;
+    const totalPages = data.numpages;
 
-    const maxPage = Math.min(pageEnd, doc.numPages);
-    const pages: string[] = [];
-    for (let i = pageStart; i <= maxPage; i++) {
-      const page = await doc.getPage(i);
-      const content = await page.getTextContent();
-      pages.push(content.items.map((item: { str?: string }) => ("str" in item ? item.str : "")).join(" "));
-    }
-    let content = pages.join("\n");
+    let content = extractPageRange(fullText, totalPages, pageStart, pageEnd);
 
-    // 1MB guard
     if (new TextEncoder().encode(content).length > MAX_CONTENT_BYTES) {
       content = content.slice(0, Math.floor(MAX_CONTENT_BYTES * 0.5));
     }
@@ -65,15 +59,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const prefix = `${textbookId}_drill_${chapterId}_`;
     const nodes = validated.nodes.map((n) => ({
-      ...n,
-      id: `${prefix}${n.id}`,
-      textbookId,
-      chapter: chapterTitle,
+      ...n, id: `${prefix}${n.id}`, textbookId, chapter: chapterTitle,
     }));
     const relations = validated.relations.map((r) => ({
-      ...r,
-      source: `${prefix}${r.source}`,
-      target: `${prefix}${r.target}`,
+      ...r, source: `${prefix}${r.source}`, target: `${prefix}${r.target}`,
     }));
 
     const subGraph: KnowledgeGraph = { nodes, relations };
