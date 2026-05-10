@@ -21,9 +21,8 @@ const PDF_FIXTURE = path.resolve(__dirname, "fixtures", "apple-pear.pdf");
 
 /** Keep the browser open after test so a human can inspect the UI state. */
 async function visualPause(page: import("@playwright/test").Page) {
-  // Only pause when running headed (not in CI / headless)
-  const isHeadless = process.argv.includes("--headed") === false;
-  if (isHeadless) return;
+  // In CI (headless) skip the pause — CI env var is set by playwright config
+  if (process.env.CI) return;
   console.log("→ Browser stays open 60 s for visual inspection...");
   await page.waitForTimeout(60_000);
 }

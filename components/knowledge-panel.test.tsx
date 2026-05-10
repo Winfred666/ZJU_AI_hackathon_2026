@@ -8,42 +8,23 @@ describe("KnowledgePanel", () => {
       <KnowledgePanel
         textbookId="tb1"
         hasGraph={false}
-        isExtracting={false}
         isIndexing={false}
-        onExtract={vi.fn()}
         onBuildIndex={vi.fn()}
       />,
     );
     expect(screen.getByText("知识处理")).toBeInTheDocument();
   });
 
-  it("disables buttons when no textbook selected", () => {
+  it("disables index button when no textbook selected", () => {
     render(
       <KnowledgePanel
         textbookId={null}
         hasGraph={false}
-        isExtracting={false}
         isIndexing={false}
-        onExtract={vi.fn()}
         onBuildIndex={vi.fn()}
       />,
     );
-    expect(screen.getByRole("button", { name: /提取知识/ })).toBeDisabled();
-    expect(screen.getByRole("button", { name: /建立索引/ })).toBeDisabled();
-  });
-
-  it("enables extract when textbook is selected", () => {
-    render(
-      <KnowledgePanel
-        textbookId="tb1"
-        hasGraph={false}
-        isExtracting={false}
-        isIndexing={false}
-        onExtract={vi.fn()}
-        onBuildIndex={vi.fn()}
-      />,
-    );
-    expect(screen.getByRole("button", { name: /提取知识/ })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /建立 RAG 索引/ })).toBeDisabled();
   });
 
   it("enables index button only when graph exists", () => {
@@ -51,13 +32,11 @@ describe("KnowledgePanel", () => {
       <KnowledgePanel
         textbookId="tb1"
         hasGraph
-        isExtracting={false}
         isIndexing={false}
-        onExtract={vi.fn()}
         onBuildIndex={vi.fn()}
       />,
     );
-    expect(screen.getByRole("button", { name: /建立索引/ })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /建立 RAG 索引/ })).not.toBeDisabled();
   });
 
   it("disables index button when no graph", () => {
@@ -65,42 +44,36 @@ describe("KnowledgePanel", () => {
       <KnowledgePanel
         textbookId="tb1"
         hasGraph={false}
-        isExtracting={false}
         isIndexing={false}
-        onExtract={vi.fn()}
         onBuildIndex={vi.fn()}
       />,
     );
-    expect(screen.getByRole("button", { name: /建立索引/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /建立 RAG 索引/ })).toBeDisabled();
   });
 
-  it("shows loader when extracting", () => {
-    const { container } = render(
+  it("shows hint text when no graph", () => {
+    render(
       <KnowledgePanel
-        textbookId="tb1"
+        textbookId={null}
         hasGraph={false}
-        isExtracting
         isIndexing={false}
-        onExtract={vi.fn()}
         onBuildIndex={vi.fn()}
       />,
     );
-    expect(container.querySelector(".lucide-loader-circle")).toBeTruthy();
+    expect(screen.getByText("上传教材后自动生成目录图谱")).toBeInTheDocument();
   });
 
-  it("calls onExtract when button clicked", () => {
-    const onExtract = vi.fn();
+  it("calls onBuildIndex when button clicked", () => {
+    const onBuildIndex = vi.fn();
     render(
       <KnowledgePanel
         textbookId="tb1"
-        hasGraph={false}
-        isExtracting={false}
+        hasGraph
         isIndexing={false}
-        onExtract={onExtract}
-        onBuildIndex={vi.fn()}
+        onBuildIndex={onBuildIndex}
       />,
     );
-    screen.getByRole("button", { name: /提取知识/ }).click();
-    expect(onExtract).toHaveBeenCalledOnce();
+    screen.getByRole("button", { name: /建立 RAG 索引/ }).click();
+    expect(onBuildIndex).toHaveBeenCalledOnce();
   });
 });

@@ -1,25 +1,205 @@
 import { describe, it, expect } from "vitest";
 import {
-  knowledgeExtractSchema,
   ragQuerySchema,
-  knowledgeNodeSchema,
-  knowledgeRelationSchema,
-  knowledgeExtractOutputSchema,
+  tocNodeSchema,
+  tocRelationSchema,
+  tocGraphOutputSchema,
+  drillRequestSchema,
+  drillOutputSchema,
 } from "./validators";
 
-describe("knowledgeExtractSchema", () => {
-  it("accepts valid textbookId", () => {
-    expect(knowledgeExtractSchema.parse({ textbookId: "abc-123" })).toEqual({
-      textbookId: "abc-123",
+describe("tocNodeSchema", () => {
+  it("accepts valid TOC node", () => {
+    expect(
+      tocNodeSchema.parse({
+        id: "toc_01",
+        name: "第一章 绪论",
+        definition: "本章概述学科基本概念",
+        category: "核心概念",
+        chapter: "第一章 绪论",
+        page: 1,
+        isTocNode: true,
+        pageRange: { start: 1, end: 20 },
+      }),
+    ).toBeTruthy();
+  });
+
+  it("rejects invalid category", () => {
+    expect(() =>
+      tocNodeSchema.parse({
+        id: "toc_01",
+        name: "x",
+        definition: "x",
+        category: "invalid",
+        chapter: "x",
+        page: 1,
+        isTocNode: true,
+      }),
+    ).toThrow();
+  });
+
+  it("rejects negative page", () => {
+    expect(() =>
+      tocNodeSchema.parse({
+        id: "toc_01",
+        name: "x",
+        definition: "x",
+        category: "定理",
+        chapter: "x",
+        page: -1,
+        isTocNode: true,
+      }),
+    ).toThrow();
+  });
+});
+
+describe("tocRelationSchema", () => {
+  it("accepts prerequisite relation", () => {
+    expect(
+      tocRelationSchema.parse({
+        source: "toc_01",
+        target: "toc_02",
+        relationType: "prerequisite",
+        description: "理解B需要A",
+      }),
+    ).toBeTruthy();
+  });
+
+  it("accepts parallel relation", () => {
+    expect(
+      tocRelationSchema.parse({
+        source: "toc_01",
+        target: "toc_02",
+        relationType: "parallel",
+        description: "AB为并列关系",
+      }),
+    ).toBeTruthy();
+  });
+
+  it("rejects invalid relationType", () => {
+    expect(() =>
+      tocRelationSchema.parse({
+        source: "n1",
+        target: "n2",
+        relationType: "references",
+        description: "x",
+      }),
+    ).toThrow();
+  });
+});
+
+describe("tocGraphOutputSchema", () => {
+  it("validates a complete TOC graph output", () => {
+    const output = {
+      nodes: [
+        {
+          id: "toc_01",
+          name: "第一章 绪论",
+          definition: "本章概述学科基本概念",
+          category: "核心概念",
+          chapter: "第一章 绪论",
+          page: 1,
+          isTocNode: true,
+          pageRange: { start: 1, end: 20 },
+        },
+      ],
+      relations: [
+        {
+          source: "toc_01",
+          target: "toc_02",
+          relationType: "prerequisite",
+          description: "需先掌握绪论",
+        },
+      ],
+      tocStructure: [
+        { id: "toc_01", name: "第一章 绪论", pageStart: 1, pageEnd: 20, parentId: null, level: 1 },
+      ],
+    };
+
+    const validated = tocGraphOutputSchema.parse(output);
+    expect(validated.nodes).toHaveLength(1);
+    expect(validated.relations).toHaveLength(1);
+    expect(validated.tocStructure).toHaveLength(1);
+  });
+
+  it("rejects missing nodes", () => {
+    expect(() =>
+      tocGraphOutputSchema.parse({ relations: [], tocStructure: [] }),
+    ).toThrow();
+  });
+});
+
+describe("drillRequestSchema", () => {
+  it("accepts valid drill request", () => {
+    expect(
+      drillRequestSchema.parse({
+        textbookId: "tb1",
+        chapterId: "toc_01",
+        pageStart: 1,
+        pageEnd: 20,
+        chapterTitle: "第一章 绪论",
+      }),
+    ).toEqual({
+      textbookId: "tb1",
+      chapterId: "toc_01",
+      pageStart: 1,
+      pageEnd: 20,
+      chapterTitle: "第一章 绪论",
     });
   });
 
   it("rejects empty textbookId", () => {
-    expect(() => knowledgeExtractSchema.parse({ textbookId: "" })).toThrow();
+    expect(() =>
+      drillRequestSchema.parse({
+        textbookId: "",
+        chapterId: "toc_01",
+        pageStart: 1,
+        pageEnd: 20,
+        chapterTitle: "x",
+      }),
+    ).toThrow();
+  });
+});
+
+describe("drillOutputSchema", () => {
+  it("validates a complete drill result", () => {
+    const output = {
+      nodes: [
+        {
+          id: "d_01",
+          name: "静息电位",
+          definition: "细胞安静时膜内外电位差",
+          category: "核心概念",
+          chapter: "第一章 绪论",
+          page: 12,
+        },
+      ],
+      relations: [
+        {
+          source: "d_01",
+          target: "d_02",
+          relationType: "contains",
+          description: "A包含B",
+        },
+      ],
+    };
+
+    const validated = drillOutputSchema.parse(output);
+    expect(validated.nodes).toHaveLength(1);
+    expect(validated.relations).toHaveLength(1);
   });
 
-  it("rejects missing textbookId", () => {
-    expect(() => knowledgeExtractSchema.parse({})).toThrow();
+  it("rejects invalid relationType (must be contains)", () => {
+    expect(() =>
+      drillOutputSchema.parse({
+        nodes: [
+          { id: "d_01", name: "x", definition: "x", category: "核心概念", chapter: "x", page: 1 },
+        ],
+        relations: [
+          { source: "d_01", target: "d_02", relationType: "prerequisite", description: "x" },
+        ],
+      }),
+    ).toThrow();
   });
 });
 
@@ -39,135 +219,6 @@ describe("ragQuerySchema", () => {
   it("rejects question over 1000 chars", () => {
     expect(() =>
       ragQuerySchema.parse({ textbookId: "tb1", question: "x".repeat(1001) }),
-    ).toThrow();
-  });
-});
-
-describe("knowledgeNodeSchema", () => {
-  it("accepts valid node", () => {
-    expect(
-      knowledgeNodeSchema.parse({
-        id: "n1",
-        name: "动作电位",
-        definition: "快速可逆的膜电位翻转",
-        category: "核心概念",
-        chapter: "第一章",
-        page: 15,
-      }),
-    ).toBeTruthy();
-  });
-
-  it("rejects invalid category", () => {
-    expect(() =>
-      knowledgeNodeSchema.parse({
-        id: "n1",
-        name: "x",
-        definition: "x",
-        category: "invalid",
-        chapter: "x",
-        page: 1,
-      }),
-    ).toThrow();
-  });
-
-  it("rejects negative page", () => {
-    expect(() =>
-      knowledgeNodeSchema.parse({
-        id: "n1",
-        name: "x",
-        definition: "x",
-        category: "定理",
-        chapter: "x",
-        page: -1,
-      }),
-    ).toThrow();
-  });
-});
-
-describe("knowledgeRelationSchema", () => {
-  it("accepts prerequisite relation", () => {
-    expect(
-      knowledgeRelationSchema.parse({
-        source: "n1",
-        target: "n2",
-        relationType: "prerequisite",
-        description: "理解B需要A",
-      }),
-    ).toBeTruthy();
-  });
-
-  it("accepts contains relation", () => {
-    expect(
-      knowledgeRelationSchema.parse({
-        source: "n1",
-        target: "n2",
-        relationType: "contains",
-        description: "A包含B",
-      }),
-    ).toBeTruthy();
-  });
-
-  it("rejects invalid relationType", () => {
-    expect(() =>
-      knowledgeRelationSchema.parse({
-        source: "n1",
-        target: "n2",
-        relationType: "references",
-        description: "x",
-      }),
-    ).toThrow();
-  });
-});
-
-describe("knowledgeExtractOutputSchema", () => {
-  it("validates a complete LLM extraction result", () => {
-    const output = {
-      nodes: [
-        {
-          id: "node_001",
-          name: "静息电位",
-          definition: "细胞安静时膜内外电位差",
-          category: "核心概念",
-          chapter: "第一章 绪论",
-          page: 12,
-        },
-        {
-          id: "node_002",
-          name: "钠钾泵",
-          definition: "主动转运Na+和K+的膜蛋白",
-          category: "方法",
-          chapter: "第二章 细胞膜",
-          page: 30,
-        },
-      ],
-      relations: [
-        {
-          source: "node_001",
-          target: "node_002",
-          relationType: "prerequisite",
-          description: "理解钠钾泵需要先理解静息电位",
-        },
-      ],
-    };
-
-    const validated = knowledgeExtractOutputSchema.parse(output);
-    expect(validated.nodes).toHaveLength(2);
-    expect(validated.relations).toHaveLength(1);
-    expect(validated.nodes[0].category).toBe("核心概念");
-  });
-
-  it("rejects missing nodes", () => {
-    expect(() =>
-      knowledgeExtractOutputSchema.parse({ relations: [] }),
-    ).toThrow();
-  });
-
-  it("rejects invalid node in array", () => {
-    expect(() =>
-      knowledgeExtractOutputSchema.parse({
-        nodes: [{ id: "x", name: "x", definition: "x", category: "bad", chapter: "x", page: 0 }],
-        relations: [],
-      }),
     ).toThrow();
   });
 });

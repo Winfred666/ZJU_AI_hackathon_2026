@@ -12,6 +12,8 @@ const sampleTextbooks: Textbook[] = [
     totalPages: 300,
     totalChars: 450000,
     chapters: [],
+    tocText: "",
+    tocPageRange: null,
     uploadedAt: Date.now(),
   },
   {
@@ -22,6 +24,8 @@ const sampleTextbooks: Textbook[] = [
     totalPages: 200,
     totalChars: 300000,
     chapters: [],
+    tocText: "",
+    tocPageRange: null,
     uploadedAt: Date.now(),
   },
   {
@@ -33,6 +37,8 @@ const sampleTextbooks: Textbook[] = [
     totalPages: 0,
     totalChars: 0,
     chapters: [],
+    tocText: "",
+    tocPageRange: null,
     uploadedAt: Date.now(),
   },
 ];
