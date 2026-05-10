@@ -5,7 +5,7 @@ import { RAGChat } from "./rag-chat";
 describe("RAGChat", () => {
   it("renders section heading", () => {
     render(<RAGChat textbookId="tb1" indexReady />);
-    expect(screen.getByText("RAG 问答")).toBeInTheDocument();
+    expect(screen.getByText("RAG 问答（TODO）")).toBeInTheDocument();
   });
 
   it("shows placeholder when no messages", () => {

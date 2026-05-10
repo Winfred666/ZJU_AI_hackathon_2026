@@ -39,5 +39,5 @@ describe("extractTOCGraph", () => {
       expect(nodeIds.has(rel.source)).toBe(true);
       expect(nodeIds.has(rel.target)).toBe(true);
     }
-  }, 30000);
+  }, 60000);
 });

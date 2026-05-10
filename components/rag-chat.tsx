@@ -31,7 +31,7 @@ export function RAGChat({ textbookId, indexReady }: { textbookId: string | null;
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <h3 className="text-sm font-semibold">RAG 问答</h3>
+      <h3 className="text-sm font-semibold">RAG 问答（TODO）</h3>
       <ScrollArea className="flex-1 rounded-md border bg-muted/30 p-3" ref={scrollRef}>
         {messages.length === 0 && <p className="py-8 text-center text-xs text-muted-foreground">输入问题，AI 将从教材中检索回答</p>}
         {messages.map((msg, i) => (

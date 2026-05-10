@@ -32,9 +32,9 @@ describe("KnowledgeGraphView", () => {
     expect(screen.getByText("暂无知识图谱")).toBeTruthy();
   });
 
-  it("renders skeleton when loading", () => {
-    const { container } = render(<KnowledgeGraphView graph={null} loading />);
-    expect(container.querySelector('[data-slot="skeleton"]')).toBeTruthy();
+  it("renders loader when loading", () => {
+    render(<KnowledgeGraphView graph={null} loading />);
+    expect(screen.getByText(/正在生成知识图谱/)).toBeTruthy();
   });
 
   it("renders container when graph has nodes", () => {

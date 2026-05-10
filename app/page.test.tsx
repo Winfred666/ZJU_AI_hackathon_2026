@@ -20,7 +20,7 @@ describe("Home page", () => {
   it("renders RAG chat section", () => {
     render(<Home />);
     expect(
-      screen.getByRole("heading", { name: /RAG 问答/i }),
+      screen.getByRole("heading", { name: /RAG 问答（TODO）/i }),
     ).toBeInTheDocument();
   });
 

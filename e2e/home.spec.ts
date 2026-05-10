@@ -10,7 +10,7 @@ test("renders app shell", async ({ page }) => {
   await page.goto("/");
   // Semantic heading in header — matches both 学科/医学 prefix
   await expect(page.getByRole("heading", { name: /知识整合智能体/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "RAG 问答" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "RAG 问答（TODO）" })).toBeVisible();
   await expect(page.getByTestId("knowledge-graph-empty")).toBeVisible();
 });
 
