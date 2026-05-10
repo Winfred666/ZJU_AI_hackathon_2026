@@ -3,16 +3,14 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    OPENAI_API_KEY: z.string().min(1),
-    OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
-    LLM_MODEL: z.string().default("gpt-4.1"),
-    EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
+    BACKBONE_MODEL_API: z.string().min(1),
+    BACKBONE_MODEL_ENDPOINT: z.string().url(),
+    BACKBONE_MODEL: z.string(),
   },
   runtimeEnv: {
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-    OPENAI_BASE_URL: process.env.OPENAI_BASE_URL,
-    LLM_MODEL: process.env.LLM_MODEL,
-    EMBEDDING_MODEL: process.env.EMBEDDING_MODEL,
+    BACKBONE_MODEL_API: process.env.BACKBONE_MODEL_API,
+    BACKBONE_MODEL_ENDPOINT: process.env.BACKBONE_MODEL_ENDPOINT,
+    BACKBONE_MODEL: process.env.BACKBONE_MODEL,
   },
   emptyStringAsUndefined: true,
 });

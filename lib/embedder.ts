@@ -4,12 +4,12 @@ import type { EmbeddingModel } from "ai";
 import { env } from "./env";
 
 const openai = createOpenAI({
-  apiKey: env.OPENAI_API_KEY,
-  baseURL: env.OPENAI_BASE_URL,
+  apiKey: env.BACKBONE_MODEL_API,
+  baseURL: env.BACKBONE_MODEL_ENDPOINT,
 });
 
 export function getEmbeddingModel(): EmbeddingModel {
-  return openai.textEmbeddingModel(env.EMBEDDING_MODEL);
+  return openai.textEmbeddingModel(env.BACKBONE_MODEL);
 }
 
 export async function embedSingle(text: string): Promise<number[]> {
