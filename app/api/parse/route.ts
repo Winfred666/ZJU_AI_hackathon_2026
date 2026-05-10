@@ -162,7 +162,8 @@ async function handlePdf(
 async function extractPdfText(buffer: Buffer): Promise<string> {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   pdfjs.GlobalWorkerOptions.workerSrc = "";
-  const doc = await pdfjs.getDocument({ data: buffer }).promise;
+  const data = new Uint8Array(buffer);
+  const doc = await pdfjs.getDocument({ data }).promise;
   const pages: string[] = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i);
