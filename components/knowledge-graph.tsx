@@ -69,13 +69,16 @@ export function KnowledgeGraphView({
 
       if (graphRef.current) {
         // Instead of destroying, just update data if instance exists
+        const textbookColors = ["#1e3a8a", "#b91c1c", "#15803d", "#a21caf", "#c2410c"];
+        const uniqueTextbookIds = [...new Set(graph.nodes.map((n) => n.textbookId))];
+        const colorMap = new Map(uniqueTextbookIds.map((id, i) => [id, textbookColors[i % textbookColors.length]]));
         graphRef.current.updateData({
           nodes: graph.nodes.map((n) => ({
             id: n.id,
             style: {
               size: 24,
-              fill: theme.nodeFill,
-              stroke: theme.nodeFill,
+              fill: colorMap.get(n.textbookId) ?? theme.nodeFill,
+              stroke: colorMap.get(n.textbookId) ?? theme.nodeFill,
               labelText: n.name,
               labelPlacement: "bottom",
               labelFontSize: 10,
@@ -119,6 +122,10 @@ export function KnowledgeGraphView({
       const width = containerRef.current.clientWidth || 800;
       const height = containerRef.current.clientHeight || 600;
 
+      const textbookColors = ["#1e3a8a", "#b91c1c", "#15803d", "#a21caf", "#c2410c"];
+      const uniqueTextbookIds = [...new Set(graph.nodes.map((n) => n.textbookId))];
+      const colorMap = new Map(uniqueTextbookIds.map((id, i) => [id, textbookColors[i % textbookColors.length]]));
+
       const g = new G6Graph({
         container: containerRef.current!,
         autoFit: "view",
@@ -130,8 +137,8 @@ export function KnowledgeGraphView({
               x: (Math.random() - 0.5) * 200 + width / 2,
               y: (Math.random() - 0.5) * 200 + height / 2,
               size: 24,
-              fill: theme.nodeFill,
-              stroke: theme.nodeFill,
+              fill: colorMap.get(n.textbookId) ?? theme.nodeFill,
+              stroke: colorMap.get(n.textbookId) ?? theme.nodeFill,
               labelText: n.name,
               labelPlacement: "bottom",
               labelFontSize: 10,
