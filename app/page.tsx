@@ -7,46 +7,77 @@ import { KnowledgePanel } from "@/components/knowledge-panel";
 import { RAGChat } from "@/components/rag-chat";
 import { Separator } from "@/components/ui/separator";
 import { useSessionStore } from "@/hooks/use-knowledge-graph";
-import { Textbook, KnowledgeGraph } from "@/types";
+import { Textbook, KnowledgeGraph, TOCGraph, KnowledgeNode } from "@/types";
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
-  const { textbooks, currentTextbookId, knowledgeGraph, ragReady, isLoading,
-    addTextbooks, selectTextbook, setKnowledgeGraph, setRagReady, setLoading, setError } = useSessionStore();
+  const {
+    textbooks, currentTextbookId, knowledgeGraph, ragReady, isLoading,
+    addTextbooks, selectTextbook, setTOCGraph, mergeSubGraph,
+    setRagReady, setLoading, setError,
+  } = useSessionStore();
 
   const handleUpload = useCallback(async (files: File[]) => {
     setLoading(true); setError(null);
     try {
-      const fd = new FormData(); files.forEach((f) => fd.append("files", f));
+      const fd = new FormData();
+      files.forEach((f) => fd.append("files", f));
       const res = await fetch("/api/parse", { method: "POST", body: fd });
       const data = await res.json();
-      if (data.error) setError(data.error);
-      else if (data.textbooks) {
+      if (data.error) { setError(data.error); return; }
+      if (data.textbooks) {
         addTextbooks(data.textbooks as Textbook[]);
-        if (data.textbooks.length > 0 && !currentTextbookId) selectTextbook(data.textbooks[0].textbookId);
+        const first = data.textbooks[0];
+        if (first && !currentTextbookId) selectTextbook(first.textbookId);
+        // Auto-load TOC graph from parse response
+        if (first && data.tocGraphs?.[first.textbookId]) {
+          setTOCGraph(data.tocGraphs[first.textbookId] as TOCGraph);
+        }
       }
     } catch { setError("上传失败"); }
     finally { setLoading(false); }
-  }, [addTextbooks, currentTextbookId, selectTextbook, setError, setLoading]);
+  }, [addTextbooks, currentTextbookId, selectTextbook, setError, setLoading, setTOCGraph]);
 
-  const handleExtract = useCallback(async () => {
-    if (!currentTextbookId) return;
+  const handleSelectTextbook = useCallback((id: string) => {
+    selectTextbook(id);
+    // Load TOC graph for selected textbook if we have it
+    // (already loaded on upload, just need to switch)
+  }, [selectTextbook]);
+
+  const handleNodeDoubleClick = useCallback(async (node: KnowledgeNode) => {
+    if (!node.isTocNode || !node.pageRange) return;
     setLoading(true); setError(null);
     try {
-      const res = await fetch("/api/knowledge/extract", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ textbookId: currentTextbookId }) });
+      const res = await fetch("/api/knowledge/drill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          textbookId: node.textbookId,
+          chapterId: node.id,
+          pageStart: node.pageRange.start,
+          pageEnd: node.pageRange.end,
+          chapterTitle: node.name,
+        }),
+      });
       const data = await res.json();
-      if (data.error) setError(data.error);
-      else if (data.graph) setKnowledgeGraph(data.graph as KnowledgeGraph);
-    } catch { setError("知识提取失败"); }
+      if (data.error) { setError(data.error); return; }
+      if (data.subGraph) {
+        mergeSubGraph(data.subGraph as KnowledgeGraph);
+      }
+    } catch { setError("章节钻取失败"); }
     finally { setLoading(false); }
-  }, [currentTextbookId, setError, setKnowledgeGraph, setLoading]);
+  }, [mergeSubGraph, setError, setLoading]);
 
   const handleBuildIndex = useCallback(async () => {
     if (!currentTextbookId) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/rag/query", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ textbookId: currentTextbookId, question: "索引初始化" }) });
+      const res = await fetch("/api/rag/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ textbookId: currentTextbookId, question: "索引初始化" }),
+      });
       const data = await res.json();
       if (!data.error) setRagReady(true);
     } catch { setError("索引建立失败"); }
@@ -72,12 +103,11 @@ export default function HomePage() {
             </div>
           )}
           <div className="h-4 w-px bg-border" />
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">V0.1 MVP</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">V0.1</span>
         </div>
       </header>
 
       <main className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar: PDF Management */}
         <aside className="flex w-1/5 min-w-[240px] flex-col border-r bg-muted/5">
           <div className="p-4">
             <UploadZone onUpload={handleUpload} disabled={isLoading} />
@@ -86,33 +116,33 @@ export default function HomePage() {
             文献列表
           </div>
           <div className="flex-1 overflow-hidden">
-            <FileList textbooks={textbooks} selectedId={currentTextbookId} onSelect={selectTextbook} />
+            <FileList textbooks={textbooks} selectedId={currentTextbookId} onSelect={handleSelectTextbook} />
           </div>
         </aside>
 
-        {/* Center: Knowledge Graph View */}
         <section className="relative flex flex-1 flex-col bg-background p-4">
           <div className={cn(
             "flex-1 rounded-xl border bg-card shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)] transition-all duration-700",
             knowledgeGraph ? "border-primary/10" : "border-dashed"
           )}>
-            <KnowledgeGraphView graph={knowledgeGraph} loading={isLoading} />
+            <KnowledgeGraphView
+              graph={knowledgeGraph}
+              loading={isLoading}
+              onNodeDoubleClick={handleNodeDoubleClick}
+            />
           </div>
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full border bg-background/80 px-4 py-1 text-[10px] font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
-            AntV/G6 可视化引擎
+            AntV/G6 · 双击节点钻取章节知识
           </div>
         </section>
 
-        {/* Right Sidebar: Controls & Chat */}
         <aside className="flex w-[340px] flex-col border-l bg-muted/5 p-4">
           <div className="rounded-xl border bg-card p-4 shadow-sm">
-            <KnowledgePanel 
-              textbookId={currentTextbookId} 
+            <KnowledgePanel
+              textbookId={currentTextbookId}
               hasGraph={!!knowledgeGraph}
-              isExtracting={isLoading} 
               isIndexing={isLoading}
-              onExtract={handleExtract} 
-              onBuildIndex={handleBuildIndex} 
+              onBuildIndex={handleBuildIndex}
             />
           </div>
           <Separator className="my-6 opacity-40" />
