@@ -4,17 +4,20 @@ import { UploadZone } from "@/components/upload-zone";
 import { FileList } from "@/components/file-list";
 import { KnowledgeGraphView } from "@/components/knowledge-graph";
 import { RAGChat } from "@/components/rag-chat";
+import { MergeConfirmDialog } from "@/components/merge-confirm-dialog";
 import { useSessionStore } from "@/hooks/use-knowledge-graph";
-import { Textbook, KnowledgeGraph, TOCGraph, KnowledgeNode } from "@/types";
-import { useCallback, useEffect } from "react";
+import { Textbook, KnowledgeGraph, TOCGraph, KnowledgeNode, MergeConfig } from "@/types";
+import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const {
     textbooks, currentTextbookId, knowledgeGraph, ragReady, isLoading,
     loadTextbooks, addTextbooks, removeTextbook, selectTextbook,
-    setTOCGraph, mergeSubGraph, setRagReady, setLoading, setError,
+    setTOCGraph, mergeSubGraph, mergeGraphs, setRagReady, setLoading, setError,
   } = useSessionStore();
+
+  const [mergePending, setMergePending] = useState<{ sourceId: string; targetId: string } | null>(null);
 
   useEffect(() => { loadTextbooks(); }, [loadTextbooks]);
 
@@ -94,6 +97,20 @@ export default function HomePage() {
     finally { setLoading(false); }
   }, [mergeSubGraph, setError, setLoading]);
 
+  const handleMerge = useCallback((sourceId: string, targetId: string) => {
+    setMergePending({ sourceId, targetId });
+  }, []);
+
+  const handleMergeConfirm = useCallback((config: MergeConfig) => {
+    if (!mergePending) return;
+    mergeGraphs(mergePending.sourceId, mergePending.targetId, config);
+    setMergePending(null);
+  }, [mergePending, mergeGraphs]);
+
+  const handleMergeCancel = useCallback(() => {
+    setMergePending(null);
+  }, []);
+
   return (
     <div className="flex h-dvh flex-col bg-background selection:bg-primary/10">
       <header className="flex h-14 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-md">
@@ -126,7 +143,12 @@ export default function HomePage() {
             文献列表
           </div>
           <div className="flex-1 overflow-hidden">
-            <FileList textbooks={textbooks} selectedId={currentTextbookId} onSelect={handleSelectTextbook} />
+            <FileList
+              textbooks={textbooks}
+              selectedId={currentTextbookId}
+              onSelect={handleSelectTextbook}
+              onMerge={handleMerge}
+            />
           </div>
         </aside>
 
@@ -146,6 +168,19 @@ export default function HomePage() {
         <aside className="flex w-[340px] flex-col border-l bg-muted/5 p-4">
           <RAGChat textbookId={currentTextbookId} indexReady={ragReady} />
         </aside>
+        {mergePending && (
+          <MergeConfirmDialog
+            open={true}
+            sourceTitle={
+              textbooks.find((t) => t.textbookId === mergePending.sourceId)?.title ?? ""
+            }
+            targetTitle={
+              textbooks.find((t) => t.textbookId === mergePending.targetId)?.title ?? ""
+            }
+            onConfirm={handleMergeConfirm}
+            onCancel={handleMergeCancel}
+          />
+        )}
       </main>
     </div>
   );
