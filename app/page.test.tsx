@@ -20,10 +20,7 @@ describe("Home page", () => {
   it("renders knowledge action buttons", () => {
     render(<Home />);
     expect(
-      screen.getByRole("button", { name: /提取知识/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /建立索引/i }),
+      screen.getByRole("button", { name: /RAG 索引/i }),
     ).toBeInTheDocument();
   });
 

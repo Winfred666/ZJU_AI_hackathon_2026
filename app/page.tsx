@@ -3,9 +3,7 @@
 import { UploadZone } from "@/components/upload-zone";
 import { FileList } from "@/components/file-list";
 import { KnowledgeGraphView } from "@/components/knowledge-graph";
-import { KnowledgePanel } from "@/components/knowledge-panel";
 import { RAGChat } from "@/components/rag-chat";
-import { Separator } from "@/components/ui/separator";
 import { useSessionStore } from "@/hooks/use-knowledge-graph";
 import { Textbook, KnowledgeGraph, TOCGraph, KnowledgeNode } from "@/types";
 import { useCallback } from "react";
@@ -69,21 +67,6 @@ export default function HomePage() {
     finally { setLoading(false); }
   }, [mergeSubGraph, setError, setLoading]);
 
-  const handleBuildIndex = useCallback(async () => {
-    if (!currentTextbookId) return;
-    setLoading(true);
-    try {
-      const res = await fetch("/api/rag/query", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ textbookId: currentTextbookId, question: "索引初始化" }),
-      });
-      const data = await res.json();
-      if (!data.error) setRagReady(true);
-    } catch { setError("索引建立失败"); }
-    finally { setLoading(false); }
-  }, [currentTextbookId, setError, setLoading, setRagReady]);
-
   return (
     <div className="flex h-dvh flex-col bg-background selection:bg-primary/10">
       <header className="flex h-14 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-md">
@@ -131,24 +114,10 @@ export default function HomePage() {
               onNodeDoubleClick={handleNodeDoubleClick}
             />
           </div>
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full border bg-background/80 px-4 py-1 text-[10px] font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
-            AntV/G6 · 双击节点钻取章节知识
-          </div>
         </section>
 
         <aside className="flex w-[340px] flex-col border-l bg-muted/5 p-4">
-          <div className="rounded-xl border bg-card p-4 shadow-sm">
-            <KnowledgePanel
-              textbookId={currentTextbookId}
-              hasGraph={!!knowledgeGraph}
-              isIndexing={isLoading}
-              onBuildIndex={handleBuildIndex}
-            />
-          </div>
-          <Separator className="my-6 opacity-40" />
-          <div className="flex flex-1 flex-col min-h-0">
-            <RAGChat textbookId={currentTextbookId} indexReady={ragReady} />
-          </div>
+          <RAGChat textbookId={currentTextbookId} indexReady={ragReady} />
         </aside>
       </main>
     </div>

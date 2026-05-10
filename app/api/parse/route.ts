@@ -50,21 +50,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         continue;
       }
 
-      // TXT / MD: always parse fully (no page concept, no TOC seek)
+      // TXT / MD: always parse fully, then extract TOC graph from content
       const rawText = new TextDecoder("utf-8").decode(buffer);
       const { chapters, fullText } = parseTxtContent(rawText, textbookId);
 
       const textbook: Textbook = {
         textbookId, filename, title: getTextbookTitle(filename),
         totalPages: estimatePages(fullText), totalChars: fullText.length,
-        chapters, tocText: "", tocPageRange: null,
+        chapters, tocText: fullText.slice(0, 500), tocPageRange: null,
         status: "full", statusDetail: "全文解析完成",
         uploadedAt: Date.now(),
       };
 
       results.push(textbook);
       textbookStore.set(textbookId, textbook);
-      tocGraphs[textbookId] = null;
+
+      const chapterPageMap = chapters.map((c) => ({
+        title: c.title, pageStart: c.pageStart, pageEnd: c.pageEnd,
+      }));
+      const tGraph = await extractTOCGraph(fullText.slice(0, 30_000), textbookId, chapterPageMap);
+      if (tGraph) tocGraphStore.set(textbookId, tGraph);
+      tocGraphs[textbookId] = tGraph;
     }
 
     return NextResponse.json({ textbooks: results, tocGraphs });
