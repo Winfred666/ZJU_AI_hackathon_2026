@@ -4,7 +4,8 @@ const CHAPTER_REGEX = /^第[\d一二三四五六七八九十百千]+章\s*[^\n]*
 
 // Patterns that signal a TOC page
 const TOC_START_PATTERNS = [
-  /^\s*目\s*录\s*$/m,
+  /^\s*目\s*录\s*$/m,          // "目录" on its own line
+  /^\d{1,4}\s*目\s*录/,        // "15目录" — page number before 目录
   /^\s*目\s*次\s*$/m,
   /^\s*Contents\s*$/im,
 ];
@@ -14,6 +15,8 @@ const TOC_END_PATTERNS = [
   /^\s*绪\s*论\s*$/m,
   /^\s*引\s*言\s*$/m,
 ];
+// Minimum TOC content length (chars) — shorter = likely false positive
+const TOC_MIN_LENGTH = 80;
 
 export function extractChapters(fullText: string, textbookId: string): Chapter[] {
   const lines = fullText.split("\n");
@@ -72,38 +75,58 @@ export function extractTOC(fullText: string, totalPages: number): {
 
   let tocStartLine = -1;
   let tocEndLine = -1;
+  let lastCandidateEnd = 0; // skip past false positives
 
   for (let i = 0; i < searchLines; i++) {
+    if (i < lastCandidateEnd) continue; // skip past previous false positive
+
     const line = lines[i].trim();
     if (tocStartLine === -1) {
       if (TOC_START_PATTERNS.some((p) => p.test(line))) {
         tocStartLine = i;
       }
-    } else if (tocEndLine === -1) {
-      if (TOC_END_PATTERNS.some((p) => p.test(line))) {
-        tocEndLine = i;
-        break;
+    } else {
+      // Scan forward to find end marker
+      let foundEnd = false;
+      let j = i;
+      for (; j < searchLines && j < tocStartLine + linesPerPage * 10; j++) {
+        if (TOC_END_PATTERNS.some((p) => p.test(lines[j].trim()))) {
+          tocEndLine = j;
+          foundEnd = true;
+          break;
+        }
       }
+
+      if (!foundEnd) {
+        tocEndLine = tocStartLine + linesPerPage * 4;
+      }
+
+      const candidateText = lines.slice(tocStartLine, tocEndLine).join("\n").trim();
+
+      // Validate: a real TOC has substantial content with chapter-like patterns
+      const hasChapterContent = CHAPTER_REGEX.test(candidateText) ||
+        /第[一二三四五六七八九十\d]+章/.test(candidateText);
+      const isLongEnough = candidateText.length >= TOC_MIN_LENGTH;
+
+      if (hasChapterContent && isLongEnough) {
+        return {
+          tocText: candidateText,
+          pageRange: {
+            start: Math.floor(tocStartLine / linesPerPage) + 1,
+            end: Math.ceil(tocEndLine / linesPerPage),
+          },
+        };
+      }
+
+      // False positive — reset and continue searching after this candidate
+      lastCandidateEnd = tocEndLine + 1;
+      tocStartLine = -1;
+      tocEndLine = -1;
+      i = j; // continue from where the end marker was found
     }
   }
 
-  if (tocStartLine === -1) {
-    return { tocText: "", pageRange: null };
-  }
-
-  if (tocEndLine === -1) {
-    tocEndLine = tocStartLine + linesPerPage * 4;
-  }
-
-  const tocText = lines.slice(tocStartLine, tocEndLine).join("\n").trim();
-
-  return {
-    tocText,
-    pageRange: {
-      start: Math.floor(tocStartLine / linesPerPage) + 1,
-      end: Math.ceil(tocEndLine / linesPerPage),
-    },
-  };
+  return { tocText: "", pageRange: null };
 }
 
 /**
