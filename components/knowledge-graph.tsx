@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { KnowledgeGraph as KG } from "@/types";
+import { KnowledgeGraph as KG, KnowledgeNode } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // G6 v5.1.1 calls console.error internally during destroy() with
@@ -38,9 +38,11 @@ function getThemeVars() {
 export function KnowledgeGraphView({
   graph,
   loading,
+  onNodeDoubleClick,
 }: {
   graph: KG | null;
   loading?: boolean;
+  onNodeDoubleClick?: (node: KnowledgeNode) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphRef = useRef<{ destroy: () => void } | null>(null);
@@ -134,6 +136,17 @@ export function KnowledgeGraphView({
 
       g.render();
       graphRef.current = g;
+
+      if (onNodeDoubleClick) {
+        g.on("node:dblclick", (evt: { target?: { id?: string } }) => {
+          const nodeId = evt.target?.id;
+          if (!nodeId) return;
+          const node = graph.nodes.find((n) => n.id === nodeId);
+          if (node?.isTocNode) {
+            onNodeDoubleClick(node);
+          }
+        });
+      }
     });
 
     return () => {
