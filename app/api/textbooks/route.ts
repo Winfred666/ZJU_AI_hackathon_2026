@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { textbookStore } from "@/app/api/parse/route";
+import { getStore } from "@/lib/store";
 
 export async function GET(): Promise<NextResponse> {
-  return NextResponse.json({ textbooks: Array.from(textbookStore.values()) });
+  const store = getStore();
+  return NextResponse.json({ textbooks: await store.listTextbooks() });
 }

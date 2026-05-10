@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { drillRequestSchema, drillOutputSchema } from "@/lib/validators";
 import { llmGenerate } from "@/lib/llm";
 import { KnowledgeGraph } from "@/types";
-import { pdfBufferStore } from "@/app/api/parse/route";
+import { getStore } from "@/lib/store";
 import { extractPageRange } from "@/lib/pdf-parser";
 
 const MAX_CONTENT_BYTES = 900_000;
@@ -31,7 +31,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { textbookId, chapterId, pageStart, pageEnd, chapterTitle } =
       drillRequestSchema.parse(body);
 
-    const buffer = pdfBufferStore.get(textbookId);
+    const store = getStore();
+
+    // Check cache first
+    const cached = await store.getDrillGraph(textbookId, chapterId);
+    if (cached) {
+      console.log(`[drill] ${chapterTitle} — CACHE HIT`);
+      return NextResponse.json({ subGraph: cached, parentNodeId: chapterId });
+    }
+
+    const buffer = await store.getPdfBuffer(textbookId);
     if (!buffer) {
       return NextResponse.json({ error: "PDF 缓存已过期，请重新上传" }, { status: 404 });
     }
@@ -67,6 +76,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }));
 
     const subGraph: KnowledgeGraph = { nodes, relations };
+
+    // Cache the drill result
+    await store.setDrillGraph(textbookId, chapterId, subGraph);
+
     return NextResponse.json({ subGraph, parentNodeId: chapterId });
   } catch (err) {
     return NextResponse.json(

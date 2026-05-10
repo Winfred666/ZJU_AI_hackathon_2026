@@ -51,6 +51,9 @@ yarn-error.log*
 .claude/
 .mcp.json
 
+# file-based database
+.data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

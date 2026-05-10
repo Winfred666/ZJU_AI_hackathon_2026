@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { textbookStore } from "@/app/api/parse/route";
+import { getStore } from "@/lib/store";
 import { ragQuerySchema } from "@/lib/validators";
 import { chunkText } from "@/lib/chunker";
 import { embedSingle } from "@/lib/embedder";
@@ -16,24 +16,25 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const body = await request.json();
     const { textbookId, question } = ragQuerySchema.parse(body);
 
-    const textbook = textbookStore.get(textbookId);
+    const store = getStore();
+    const textbook = await store.getTextbook(textbookId);
     if (!textbook) return NextResponse.json({ error: "教材未找到" }, { status: 404 });
 
-    const store = getVectorStore();
+    const vs = getVectorStore();
 
-    if (store.size === 0) {
+    if (vs.size === 0) {
       const chunks = textbook.chapters.flatMap((ch) =>
         chunkText(ch.content, { textbookId, textbookName: textbook.title, chapter: ch.title, page: ch.pageStart }),
       );
       for (let i = 0; i < chunks.length; i += 20) {
         const batch = chunks.slice(i, i + 20);
         const embeddings = await Promise.all(batch.map((c) => embedSingle(c.text)));
-        store.upsert(batch.map((c, idx) => ({ id: c.id, text: c.text, vector: embeddings[idx], metadata: c.metadata })));
+        vs.upsert(batch.map((c, idx) => ({ id: c.id, text: c.text, vector: embeddings[idx], metadata: c.metadata })));
       }
     }
 
     const queryVector = await embedSingle(question);
-    const results = store.query(queryVector, 5, textbookId);
+    const results = vs.query(queryVector, 5, textbookId);
 
     if (results.length === 0) {
       return NextResponse.json({
