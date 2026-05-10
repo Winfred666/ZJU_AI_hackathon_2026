@@ -133,3 +133,10 @@ export interface VectorSearchResult {
   metadata: ChunkMetadata;
   score: number;
 }
+
+// ---- Graph Merge ----
+
+export interface MergeConfig {
+  /** Whether to fuse same-name nodes across the two source graphs */
+  fuseSameName: boolean;
+}
