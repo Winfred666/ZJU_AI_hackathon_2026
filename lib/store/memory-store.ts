@@ -36,4 +36,14 @@ export class MemoryStore implements Store {
 
   async getTextbookIdByHash(sha256: string) { return this.fileHashes.get(sha256) ?? null; }
   async setFileHash(sha256: string, textbookId: string) { this.fileHashes.set(sha256, textbookId); }
+
+  async deleteAll(textbookId: string) {
+    this.textbooks.delete(textbookId);
+    this.tocGraphs.delete(textbookId);
+    const prefix = `${textbookId}:`;
+    for (const key of this.drillGraphs.keys()) {
+      if (key.startsWith(prefix)) this.drillGraphs.delete(key);
+    }
+    this.pdfBuffers.delete(textbookId);
+  }
 }

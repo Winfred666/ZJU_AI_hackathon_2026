@@ -114,4 +114,13 @@ export class FileStore implements Store {
   async setFileHash(sha256: string, textbookId: string) {
     await writeJson(NS.fileHash(sha256), textbookId);
   }
+
+  async deleteAll(textbookId: string) {
+    await Promise.all([
+      this.deleteTextbook(textbookId),
+      this.deleteTOCGraph(textbookId),
+      this.deleteDrillGraphs(textbookId),
+      this.deletePdfBuffer(textbookId),
+    ]);
+  }
 }

@@ -6,15 +6,17 @@ import { KnowledgeGraphView } from "@/components/knowledge-graph";
 import { RAGChat } from "@/components/rag-chat";
 import { useSessionStore } from "@/hooks/use-knowledge-graph";
 import { Textbook, KnowledgeGraph, TOCGraph, KnowledgeNode } from "@/types";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const {
     textbooks, currentTextbookId, knowledgeGraph, ragReady, isLoading,
-    addTextbooks, selectTextbook, setTOCGraph, mergeSubGraph,
-    setRagReady, setLoading, setError,
+    loadTextbooks, addTextbooks, removeTextbook, selectTextbook,
+    setTOCGraph, mergeSubGraph, setRagReady, setLoading, setError,
   } = useSessionStore();
+
+  useEffect(() => { loadTextbooks(); }, [loadTextbooks]);
 
   const handleUpload = useCallback(async (files: File[]) => {
     setLoading(true); setError(null);
@@ -76,7 +78,7 @@ export default function HomePage() {
             <span className="text-xs font-bold">ZJU</span>
           </div>
           <h1 className="text-lg font-bold tracking-tight text-foreground/90">
-            医学知识整合智能体
+            医学知识整合智能体（请上传小文件，双击节点能展开更多！）
           </h1>
         </div>
         <div className="flex items-center gap-4">
@@ -100,7 +102,7 @@ export default function HomePage() {
             文献列表
           </div>
           <div className="flex-1 overflow-hidden">
-            <FileList textbooks={textbooks} selectedId={currentTextbookId} onSelect={handleSelectTextbook} />
+            <FileList textbooks={textbooks} selectedId={currentTextbookId} onSelect={handleSelectTextbook} onDelete={removeTextbook} />
           </div>
         </aside>
 

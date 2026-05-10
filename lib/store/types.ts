@@ -20,4 +20,7 @@ export interface Store {
 
   getTextbookIdByHash(sha256: string): Promise<string | null>;
   setFileHash(sha256: string, textbookId: string): Promise<void>;
+
+  /** Delete all data for a textbook (textbook, TOC graph, drill graphs, PDF buffer) */
+  deleteAll(textbookId: string): Promise<void>;
 }

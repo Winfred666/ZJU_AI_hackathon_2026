@@ -11,3 +11,13 @@ export async function GET(
   if (!textbook) return NextResponse.json({ error: "教材未找到" }, { status: 404 });
   return NextResponse.json({ textbook });
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+): Promise<NextResponse> {
+  const { id } = await params;
+  const store = getStore();
+  await store.deleteAll(id);
+  return NextResponse.json({ success: true });
+}

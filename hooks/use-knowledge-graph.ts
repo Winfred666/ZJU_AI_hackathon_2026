@@ -6,25 +6,24 @@ import { Textbook, KnowledgeGraph, TOCGraph } from "@/types";
 interface SessionState {
   textbooks: Textbook[];
   currentTextbookId: string | null;
-  /** Graphs keyed by textbookId */
   graphs: Record<string, KnowledgeGraph>;
   knowledgeGraph: KnowledgeGraph | null;
   ragReady: boolean;
   isLoading: boolean;
   error: string | null;
 
+  loadTextbooks: () => Promise<void>;
   addTextbooks: (textbooks: Textbook[]) => void;
+  removeTextbook: (id: string) => Promise<void>;
   selectTextbook: (id: string | null) => void;
-  /** Store TOC graph for a specific textbook and show it if current */
   setTOCGraph: (textbookId: string, graph: TOCGraph | null) => void;
-  /** Merge a drill-down sub-graph into the current textbook's graph */
   mergeSubGraph: (textbookId: string, subGraph: KnowledgeGraph) => void;
   setRagReady: (ready: boolean) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }
 
-export const useSessionStore = create<SessionState>((set) => ({
+export const useSessionStore = create<SessionState>((set, get) => ({
   textbooks: [],
   currentTextbookId: null,
   graphs: {},
@@ -33,7 +32,30 @@ export const useSessionStore = create<SessionState>((set) => ({
   isLoading: false,
   error: null,
 
+  loadTextbooks: async () => {
+    try {
+      const res = await fetch("/api/textbooks");
+      const data = await res.json();
+      if (data.textbooks) {
+        set({ textbooks: data.textbooks as Textbook[] });
+      }
+    } catch { /* silent — server may not be ready */ }
+  },
+
   addTextbooks: (textbooks) => set((s) => ({ textbooks: [...s.textbooks, ...textbooks] })),
+
+  removeTextbook: async (id) => {
+    const s = get();
+    // Optimistic UI
+    set({
+      textbooks: s.textbooks.filter((tb) => tb.textbookId !== id),
+      currentTextbookId: s.currentTextbookId === id ? null : s.currentTextbookId,
+      knowledgeGraph: s.currentTextbookId === id ? null : s.knowledgeGraph,
+    });
+    try {
+      await fetch(`/api/textbooks/${id}`, { method: "DELETE" });
+    } catch { /* silent */ }
+  },
 
   selectTextbook: (id) =>
     set((s) => {
@@ -47,7 +69,6 @@ export const useSessionStore = create<SessionState>((set) => ({
         ? { nodes: tocGraph.nodes, relations: tocGraph.relations }
         : null;
       const graphs = graph ? { ...s.graphs, [textbookId]: graph } : s.graphs;
-      // Show this graph if the textbook is currently selected
       return {
         graphs,
         knowledgeGraph: s.currentTextbookId === textbookId ? graph : s.knowledgeGraph,
