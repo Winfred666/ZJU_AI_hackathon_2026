@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { Textbook, TOCGraph } from "@/types";
 import { processFile, makeError } from "@/lib/process-file";
 
+export const maxDuration = 60; // Vercel Pro: allow up to 60s for LLM TOC extraction
+
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const formData = await request.formData();

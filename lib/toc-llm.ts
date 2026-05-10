@@ -50,7 +50,7 @@ ${chapterHints}
 请分析上述目录，提取章节结构和关系。`;
 
   try {
-    const raw = await llmGenerate({ system: TOC_SYSTEM, prompt, temperature: 0.2 });
+    const raw = await llmGenerate({ system: TOC_SYSTEM, prompt, temperature: 0.2, maxTokens: 2048 });
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
 

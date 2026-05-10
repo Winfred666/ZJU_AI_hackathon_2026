@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { Textbook, TOCGraph } from "@/types";
 import { processFile, makeError } from "@/lib/process-file";
 
+export const maxDuration = 60; // Vercel Pro: allow up to 60s for LLM TOC extraction
+
 // In-memory chunk assembly — survives warm invocations on Vercel
 const chunkStore = new Map<string, { chunks: Buffer[]; totalChunks: number; filename: string; received: number; expires: number }>();
 

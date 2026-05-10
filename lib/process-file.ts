@@ -146,7 +146,7 @@ async function buildResult(
   };
   await store.setTextbook(textbookId, tb);
 
-  const llmInput = (tocText ?? fullText).slice(0, 30_000);
+  const llmInput = (tocText ?? fullText).slice(0, 15_000);
   console.log(`[parse] ${title} — LLM (${llmInput.length} chars)`);
   const cpm = chapters.map((c) => ({ title: c.title, pageStart: c.pageStart, pageEnd: c.pageEnd }));
   const t0 = performance.now();
