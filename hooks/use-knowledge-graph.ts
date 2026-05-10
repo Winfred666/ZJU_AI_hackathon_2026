@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { Textbook, KnowledgeGraph, TOCGraph } from "@/types";
+import { Textbook, KnowledgeGraph, KnowledgeNode, KnowledgeRelation, TOCGraph, MergeConfig } from "@/types";
 
 interface SessionState {
   textbooks: Textbook[];
@@ -19,7 +19,7 @@ interface SessionState {
   setTOCGraph: (textbookId: string, graph: TOCGraph | null) => void;
   mergeSubGraph: (textbookId: string, subGraph: KnowledgeGraph) => void;
   /** Merge two textbook graphs into a new merged graph */
-  mergeGraphs: (idA: string, idB: string, config: import("@/types").MergeConfig) => string;
+  mergeGraphs: (idA: string, idB: string, config: MergeConfig) => string;
   setRagReady: (ready: boolean) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -133,13 +133,13 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       const textbookB = s.textbooks.find((t) => t.textbookId === idB);
       if (!textbookA || !textbookB) return {};
 
-      let nodes: import("@/types").KnowledgeNode[];
-      let relations: import("@/types").KnowledgeRelation[];
+      let nodes: KnowledgeNode[];
+      let relations: KnowledgeRelation[];
 
       if (config.fuseSameName) {
         // Merge same-name nodes: deduplicate by lowercase name, keep first node, copy relations
         const nameMap = new Map<string, string>(); // lowercase name -> canonical node id
-        const mergedNodes: import("@/types").KnowledgeNode[] = [];
+        const mergedNodes: KnowledgeNode[] = [];
 
         for (const n of [...graphA.nodes, ...graphB.nodes]) {
           const key = n.name.toLowerCase();
@@ -152,9 +152,6 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
         // Remap relations to canonical node ids
         const remapped = new Map<string, string>();
-        for (const n of mergedNodes) {
-          remapped.set(n.id, n.id);
-        }
         for (const n of [...graphA.nodes, ...graphB.nodes]) {
           const key = n.name.toLowerCase();
           const canonical = nameMap.get(key);
@@ -163,7 +160,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
           }
         }
         const seen = new Set<string>();
-        const mergedRelations: import("@/types").KnowledgeRelation[] = [];
+        const mergedRelations: KnowledgeRelation[] = [];
         for (const r of [...graphA.relations, ...graphB.relations]) {
           const src = remapped.get(r.source) ?? r.source;
           const tgt = remapped.get(r.target) ?? r.target;
@@ -181,7 +178,9 @@ export const useSessionStore = create<SessionState>((set, get) => ({
           ...graphA.nodes.map((n) => ({ ...n, id: prefixA + n.id, textbookId: idA })),
           ...graphB.nodes.map((n) => ({ ...n, id: prefixB + n.id, textbookId: idB })),
         ];
-        relations = [
+        const seenRel = new Set<string>();
+        relations = [];
+        for (const r of [
           ...graphA.relations.map((r) => ({
             ...r,
             source: prefixA + r.source,
@@ -192,12 +191,17 @@ export const useSessionStore = create<SessionState>((set, get) => ({
             source: prefixB + r.source,
             target: prefixB + r.target,
           })),
-        ];
+        ]) {
+          const key = `${r.source}->${r.target}`;
+          if (seenRel.has(key)) continue;
+          seenRel.add(key);
+          relations.push(r);
+        }
       }
 
-      const mergedGraph: import("@/types").KnowledgeGraph = { nodes, relations };
+      const mergedGraph: KnowledgeGraph = { nodes, relations };
 
-      const mergedTextbook: import("@/types").Textbook = {
+      const mergedTextbook: Textbook = {
         textbookId: mergedId,
         filename: `${textbookA.filename} + ${textbookB.filename}`,
         title: `${textbookA.title} + ${textbookB.title}`,
