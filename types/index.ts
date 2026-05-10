@@ -1,3 +1,5 @@
+// ---- Textbook & Parsing ----
+
 export interface Chapter {
   chapterId: string;
   title: string;
@@ -14,6 +16,10 @@ export interface ParseResult {
   totalPages: number;
   totalChars: number;
   chapters: Chapter[];
+  /** Raw TOC text extracted from PDF front matter */
+  tocText: string;
+  /** Pages where TOC was found (inclusive) */
+  tocPageRange: { start: number; end: number } | null;
 }
 
 export interface Textbook extends ParseResult {
@@ -21,6 +27,8 @@ export interface Textbook extends ParseResult {
   errorMessage?: string;
   uploadedAt: number;
 }
+
+// ---- Knowledge Graph ----
 
 export interface KnowledgeNode {
   id: string;
@@ -30,9 +38,13 @@ export interface KnowledgeNode {
   chapter: string;
   page: number;
   textbookId: string;
+  /** If true, this is a TOC-level chapter node (can be drilled into) */
+  isTocNode?: boolean;
+  /** Chapter page range for drill-down (only on TOC nodes) */
+  pageRange?: { start: number; end: number };
 }
 
-export type RelationType = "prerequisite" | "contains";
+export type RelationType = "prerequisite" | "contains" | "parallel";
 
 export interface KnowledgeRelation {
   source: string;
@@ -46,6 +58,35 @@ export interface KnowledgeGraph {
   relations: KnowledgeRelation[];
 }
 
+// ---- TOC Graph (returned by parse API) ----
+
+export interface TOCNode {
+  id: string;
+  name: string;
+  pageStart: number;
+  pageEnd: number;
+  parentId: string | null;
+  level: 1 | 2;
+}
+
+export interface TOCGraph {
+  nodes: KnowledgeNode[];
+  relations: KnowledgeRelation[];
+  tocStructure: TOCNode[];
+}
+
+// ---- Drill-down ----
+
+export interface DrillRequest {
+  textbookId: string;
+  chapterId: string;
+  pageStart: number;
+  pageEnd: number;
+  chapterTitle: string;
+}
+
+// ---- RAG ----
+
 export interface Citation {
   textbook: string;
   chapter: string;
@@ -58,6 +99,13 @@ export interface RAGQueryResponse {
   citations: Citation[];
   sourceChunks: string[];
 }
+
+export interface RAGQueryRequest {
+  textbookId: string;
+  question: string;
+}
+
+// ---- Vector Store ----
 
 export interface ChunkMetadata {
   textbookId: string;
