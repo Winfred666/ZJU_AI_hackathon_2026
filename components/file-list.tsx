@@ -59,14 +59,22 @@ export function FileList({ textbooks, selectedId, onSelect }: {
               {statusIcon[tb.status]}
             </button>
 
-            {/* Hover tooltip for partial/toc_only status */}
-            {(tb.status === "partial" || tb.status === "toc_only") && (
+            {/* Hover tooltip for non-full status */}
+            {tb.status !== "full" && (
               <div className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
                 <div className="rounded-md border bg-popover px-3 py-2 text-xs shadow-md">
-                  <p className="font-medium">
-                    {tb.status === "partial" ? "部分解析（双击继续）" : "目录已解析"}
+                  <p className={cn(
+                    "font-medium",
+                    tb.status === "error" && "text-destructive",
+                  )}>
+                    {tb.status === "partial" && "部分解析（双击继续）"}
+                    {tb.status === "toc_only" && "目录已解析"}
+                    {tb.status === "error" && "解析失败"}
                   </p>
                   <p className="text-muted-foreground">{tb.statusDetail}</p>
+                  {tb.status === "error" && tb.errorMessage && (
+                    <p className="mt-1 max-w-[240px] text-destructive/80">{tb.errorMessage}</p>
+                  )}
                   {tb.status === "partial" && (
                     <p className="mt-1 font-medium text-amber-400">双击条目继续解析后续页面</p>
                   )}
