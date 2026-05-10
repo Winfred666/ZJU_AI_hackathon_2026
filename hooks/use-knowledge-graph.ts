@@ -18,6 +18,8 @@ interface SessionState {
   selectTextbook: (id: string | null) => void;
   setTOCGraph: (textbookId: string, graph: TOCGraph | null) => void;
   mergeSubGraph: (textbookId: string, subGraph: KnowledgeGraph) => void;
+  /** Merge two textbook graphs into a new merged graph */
+  mergeGraphs: (idA: string, idB: string, config: import("@/types").MergeConfig) => string;
   setRagReady: (ready: boolean) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -119,6 +121,106 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         knowledgeGraph: s.currentTextbookId === textbookId ? merged : s.knowledgeGraph,
       };
     }),
+
+  mergeGraphs: (idA, idB, config) => {
+    const mergedId = `merged_${idA}_${idB}_${Date.now()}`;
+    set((s) => {
+      const graphA = s.graphs[idA];
+      const graphB = s.graphs[idB];
+      if (!graphA || !graphB) return {};
+
+      const textbookA = s.textbooks.find((t) => t.textbookId === idA);
+      const textbookB = s.textbooks.find((t) => t.textbookId === idB);
+      if (!textbookA || !textbookB) return {};
+
+      let nodes: import("@/types").KnowledgeNode[];
+      let relations: import("@/types").KnowledgeRelation[];
+
+      if (config.fuseSameName) {
+        // Merge same-name nodes: deduplicate by lowercase name, keep first node, copy relations
+        const nameMap = new Map<string, string>(); // lowercase name -> canonical node id
+        const mergedNodes: import("@/types").KnowledgeNode[] = [];
+
+        for (const n of [...graphA.nodes, ...graphB.nodes]) {
+          const key = n.name.toLowerCase();
+          const existing = nameMap.get(key);
+          if (existing) continue; // skip duplicate
+          nameMap.set(key, n.id);
+          mergedNodes.push(n);
+        }
+        nodes = mergedNodes;
+
+        // Remap relations to canonical node ids
+        const remapped = new Map<string, string>();
+        for (const n of mergedNodes) {
+          remapped.set(n.id, n.id);
+        }
+        for (const n of [...graphA.nodes, ...graphB.nodes]) {
+          const key = n.name.toLowerCase();
+          const canonical = nameMap.get(key);
+          if (canonical && canonical !== n.id) {
+            remapped.set(n.id, canonical);
+          }
+        }
+        const seen = new Set<string>();
+        const mergedRelations: import("@/types").KnowledgeRelation[] = [];
+        for (const r of [...graphA.relations, ...graphB.relations]) {
+          const src = remapped.get(r.source) ?? r.source;
+          const tgt = remapped.get(r.target) ?? r.target;
+          const key = `${src}->${tgt}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          mergedRelations.push({ ...r, source: src, target: tgt });
+        }
+        relations = mergedRelations;
+      } else {
+        // Keep nodes split: prefix ids with source textbook to avoid collision
+        const prefixA = `${idA}::`;
+        const prefixB = `${idB}::`;
+        nodes = [
+          ...graphA.nodes.map((n) => ({ ...n, id: prefixA + n.id, textbookId: idA })),
+          ...graphB.nodes.map((n) => ({ ...n, id: prefixB + n.id, textbookId: idB })),
+        ];
+        relations = [
+          ...graphA.relations.map((r) => ({
+            ...r,
+            source: prefixA + r.source,
+            target: prefixA + r.target,
+          })),
+          ...graphB.relations.map((r) => ({
+            ...r,
+            source: prefixB + r.source,
+            target: prefixB + r.target,
+          })),
+        ];
+      }
+
+      const mergedGraph: import("@/types").KnowledgeGraph = { nodes, relations };
+
+      const mergedTextbook: import("@/types").Textbook = {
+        textbookId: mergedId,
+        filename: `${textbookA.filename} + ${textbookB.filename}`,
+        title: `${textbookA.title} + ${textbookB.title}`,
+        totalPages: textbookA.totalPages + textbookB.totalPages,
+        totalChars: textbookA.totalChars + textbookB.totalChars,
+        chapters: [...textbookA.chapters, ...textbookB.chapters],
+        tocText: "",
+        tocPageRange: null,
+        status: "full",
+        statusDetail: config.fuseSameName ? "已合并（融合同名节点）" : "已合并（保持节点独立）",
+        uploadedAt: Date.now(),
+      };
+
+      return {
+        textbooks: [...s.textbooks, mergedTextbook],
+        graphs: { ...s.graphs, [mergedId]: mergedGraph },
+        currentTextbookId: mergedId,
+        knowledgeGraph: mergedGraph,
+        ragReady: false,
+      };
+    });
+    return mergedId;
+  },
 
   setRagReady: (ready) => set({ ragReady: ready }),
   setLoading: (loading) => set({ isLoading: loading }),
