@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { llmGenerate } from "./llm";
 import { extractTOCGraph } from "./toc-llm";
 import { readFileSync } from "fs";
 import { resolve } from "path";
@@ -10,25 +9,6 @@ const applePearTxt = readFileSync(
 );
 
 describe("extractTOCGraph", () => {
-  it("traces LLM raw response", async () => {
-    // First, just test the raw LLM call with a simpler prompt
-    const raw = await llmGenerate({
-      system: "You are a helpful assistant. Output only valid JSON, nothing else.",
-      prompt: `Textbook content:\n${applePearTxt.slice(0, 1500)}\n\nReturn: {"chapters": [{"title": "chapter name", "summary": "1-sentence summary"}]}`,
-      temperature: 0.2,
-    });
-    console.log("=== RAW LLM RESPONSE ===");
-    console.log(raw.slice(0, 2000));
-    console.log("=== END RAW ===");
-
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    console.log("JSON match found:", !!jsonMatch);
-    if (jsonMatch) {
-      console.log("JSON preview:", jsonMatch[0].slice(0, 500));
-    }
-    expect(raw.length).toBeGreaterThan(0);
-  });
-
   it("returns a valid TOC graph from apple-pear textbook text", async () => {
     const chapterPageMap = [
       { title: "第一章 苹果的基础知识", pageStart: 1, pageEnd: 1 },
@@ -42,10 +22,22 @@ describe("extractTOCGraph", () => {
       chapterPageMap,
     );
 
-    // Must not be null — LLM should always return valid JSON
     expect(result).not.toBeNull();
     expect(result!.nodes.length).toBeGreaterThan(0);
     expect(result!.relations.length).toBeGreaterThan(0);
     expect(result!.tocStructure.length).toBeGreaterThan(0);
-  }, 60000);
+
+    for (const node of result!.nodes) {
+      expect(node.id).toBeTruthy();
+      expect(node.name).toBeTruthy();
+      expect(node.isTocNode).toBe(true);
+      expect(node.pageRange).toBeTruthy();
+    }
+
+    const nodeIds = new Set(result!.nodes.map((n) => n.id));
+    for (const rel of result!.relations) {
+      expect(nodeIds.has(rel.source)).toBe(true);
+      expect(nodeIds.has(rel.target)).toBe(true);
+    }
+  }, 30000);
 });

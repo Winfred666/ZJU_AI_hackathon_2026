@@ -1,55 +1,31 @@
 /**
- * Full-flow E2E test: upload → parse → extract → graph → RAG
+ * Full-flow E2E test: upload → parse → auto knowledge graph
  *
  * === VISUAL INSPECTION (headed mode) ===
  *   npx playwright test --headed --workers=1 e2e/full-flow.spec.ts
  *
- *   The browser stays open 60 s after each test so you can inspect the UI.
- *   Use a single worker (--workers=1) to avoid overlapping windows.
- *
- * === DEBUG (step-by-step with Inspector) ===
- *   npx playwright test --headed --workers=1 --debug e2e/full-flow.spec.ts
- *
- * === HEADLESS (CI / quick check) ===
+ * === HEADLESS ===
  *   npx playwright test e2e/full-flow.spec.ts
  */
 import { test, expect } from "@playwright/test";
 import path from "path";
 
-const TXT_FIXTURE = path.resolve(__dirname, "fixtures", "apple-pear.txt");
-const PDF_FIXTURE = path.resolve(__dirname, "fixtures", "apple-pear.pdf");
+const SMALL_PDF = path.resolve(__dirname, "fixtures", "apple-pear.pdf");
+const BIG_PDF = path.resolve(__dirname, "..", "docs", "textbook", "03_生理学.pdf");
 
-/** Keep the browser open after test so a human can inspect the UI state. */
+/** Keep browser open for visual inspection (skipped in CI). */
 async function visualPause(page: import("@playwright/test").Page) {
-  // In CI (headless) skip the pause — CI env var is set by playwright config
   if (process.env.CI) return;
   console.log("→ Browser stays open 60 s for visual inspection...");
   await page.waitForTimeout(60_000);
 }
 
 test.describe("Full upload flow", () => {
-  test("upload .txt → parse → file list → extract button enabled", async ({
+  test("small PDF (< 50KB) → full file parsing → knowledge graph renders", async ({
     page,
   }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
 
-    // --- Load app ---
-    await page.goto("/");
-    await expect(page.getByText("暂无教材")).toBeVisible();
-
-    // --- Upload .txt ---
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(TXT_FIXTURE);
-
-    await expect(page.getByText("暂无教材")).not.toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("apple-pear")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/k字/)).toBeVisible({ timeout: 5000 });
-
-    // --- Extract button enabled ---
-    const extractBtn = page.getByRole("button", { name: "提取知识" });
-    await expect(extractBtn).not.toBeDisabled({ timeout: 5000 });
-
-    // --- Click extract (LLM API key not configured yet — may error, that's ok) ---
     const realErrors: string[] = [];
     page.on("console", (msg) => {
       if (
@@ -61,50 +37,53 @@ test.describe("Full upload flow", () => {
       }
     });
 
-    await extractBtn.click();
+    await page.goto("/");
+    await expect(page.getByText("暂无教材")).toBeVisible();
 
-    const graphOrError = page.locator(
-      '[data-testid="knowledge-graph"], [data-testid="knowledge-graph-empty"]',
-    );
-    await graphOrError
-      .waitFor({ state: "visible", timeout: 25000 })
-      .catch(() => {
-        console.log(
-          "Extraction in progress or API unavailable (expected — no LLM key configured yet)",
-        );
-      });
+    // Upload small PDF — falls into tiny-file branch (< 50KB)
+    // → full text parsed → TOC graph extracted from full content
+    await page.locator('input[type="file"]').setInputFiles(SMALL_PDF);
+
+    // File appears with "full" parse status
+    await expect(page.getByText(/apple pear/i)).toBeVisible({ timeout: 15000 });
+
+    // Knowledge graph renders from full-file LLM extraction
+    await expect(page.getByTestId("knowledge-graph")).toBeVisible({ timeout: 60000 });
 
     expect(realErrors).toHaveLength(0);
-    await page.pause(); // keep browser open — inspect the graph result
+    await page.pause();
   });
 
-  test("upload .pdf → parse and show in file list", async ({ page }) => {
-    test.setTimeout(120_000);
+  test("big PDF (> 50KB) → TOC-only parsing → knowledge graph renders", async ({
+    page,
+  }) => {
+    test.setTimeout(300_000); // big file upload + TOC extraction may take a while
+
+    const realErrors: string[] = [];
+    page.on("console", (msg) => {
+      if (
+        msg.type() === "error" &&
+        !msg.text().startsWith("[G6") &&
+        !msg.text().includes("Failed to load resource")
+      ) {
+        realErrors.push(msg.text());
+      }
+    });
 
     await page.goto("/");
     await expect(page.getByText("暂无教材")).toBeVisible();
 
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(PDF_FIXTURE);
+    // Upload big PDF (~32MB) — falls into TOC extraction branch
+    // → extract TOC pages → LLM builds graph from TOC text
+    await page.locator('input[type="file"]').setInputFiles(BIG_PDF);
 
-    await expect(page.getByText("apple-pear")).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/k字/)).toBeVisible({ timeout: 5000 });
+    // File appears with "toc_only" status (目录解析)
+    await expect(page.getByText(/生理/i)).toBeVisible({ timeout: 30000 });
 
-    await visualPause(page);
-  });
+    // Knowledge graph renders from TOC LLM extraction
+    await expect(page.getByTestId("knowledge-graph")).toBeVisible({ timeout: 120000 });
 
-  test("drag-and-drop .txt onto upload zone", async ({ page }) => {
-    test.setTimeout(120_000);
-
-    await page.goto("/");
-    await expect(page.getByText("暂无教材")).toBeVisible();
-
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(TXT_FIXTURE);
-
-    await expect(page.getByText("暂无教材")).not.toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("apple-pear")).toBeVisible({ timeout: 10000 });
-
-    await visualPause(page);
+    expect(realErrors).toHaveLength(0);
+    await page.pause();
   });
 });

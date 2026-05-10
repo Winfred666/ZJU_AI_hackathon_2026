@@ -9,7 +9,7 @@ const openai = createOpenAI({
 });
 
 export function getEmbeddingModel(): EmbeddingModel {
-  return openai.textEmbeddingModel(env.OPENAI_MODEL);
+  return openai.textEmbeddingModel(env.EMBEDDING_MODEL);
 }
 
 export async function embedSingle(text: string): Promise<number[]> {

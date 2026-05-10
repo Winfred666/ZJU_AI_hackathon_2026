@@ -29,8 +29,11 @@ export default function HomePage() {
         const first = data.textbooks[0];
         if (first && !currentTextbookId) selectTextbook(first.textbookId);
         // Auto-load TOC graph from parse response
-        if (first && data.tocGraphs?.[first.textbookId]) {
-          setTOCGraph(data.tocGraphs[first.textbookId] as TOCGraph);
+        // Store all returned TOC graphs per textbook
+        if (data.tocGraphs) {
+          for (const [id, tg] of Object.entries(data.tocGraphs)) {
+            setTOCGraph(id, tg as TOCGraph | null);
+          }
         }
       }
     } catch { setError("上传失败"); }
@@ -61,7 +64,7 @@ export default function HomePage() {
       const data = await res.json();
       if (data.error) { setError(data.error); return; }
       if (data.subGraph) {
-        mergeSubGraph(data.subGraph as KnowledgeGraph);
+        mergeSubGraph(node.textbookId, data.subGraph as KnowledgeGraph);
       }
     } catch { setError("章节钻取失败"); }
     finally { setLoading(false); }

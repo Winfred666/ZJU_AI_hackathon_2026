@@ -8,7 +8,9 @@ const openai = createOpenAI({
 });
 
 export function getLanguageModel(): LanguageModel {
-  return openai.languageModel(env.OPENAI_MODEL);
+  // openai.chat() uses /chat/completions — compatible with DeepSeek and other
+  // OpenAI-compatible providers that don't support the Responses API.
+  return openai.chat(env.OPENAI_MODEL) as unknown as LanguageModel;
 }
 
 export interface LLMGenerateOptions {
