@@ -8,7 +8,8 @@ import { MergeConfirmDialog } from "@/components/merge-confirm-dialog";
 import { useSessionStore } from "@/hooks/use-knowledge-graph";
 import { Textbook, KnowledgeGraph, TOCGraph, KnowledgeNode, MergeConfig } from "@/types";
 import { useCallback, useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
+import { sha256Browser } from "@/lib/utils/hash";
 
 export default function HomePage() {
   const {
@@ -25,15 +26,32 @@ export default function HomePage() {
     setLoading(true); setError(null);
     try {
       for (const file of files) {
+        // Check SHA-256 hash BEFORE uploading — skip if already cached
+        const buf = await file.arrayBuffer();
+        const hash = await sha256Browser(buf);
+
+        const checkRes = await fetch(`/api/files/check?hash=${encodeURIComponent(hash)}`);
+        const checkData = await checkRes.json();
+
+        if (checkData.found && checkData.textbook) {
+          // File already parsed — use cached data, no upload needed
+          console.log(`[upload] ${file.name} — SKIP (cached, ${hash.slice(0, 8)}...)`);
+          addTextbooks([checkData.textbook as Textbook]);
+          if (checkData.tocGraph) {
+            setTOCGraph(checkData.textbook.textbookId, checkData.tocGraph as TOCGraph);
+          }
+          if (!currentTextbookId) selectTextbook(checkData.textbook.textbookId);
+          continue;
+        }
+
+        // New file — upload
         let data: any;
         if (file.size < 2 * 1024 * 1024) {
-          // Small file: direct upload
           const fd = new FormData();
           fd.append("files", file);
           const res = await fetch("/api/parse", { method: "POST", body: fd });
           data = await res.json();
         } else {
-          // Large file: chunked upload (2MB chunks, stays under Vercel 4.5MB limit)
           const CHUNK_SIZE = 2 * 1024 * 1024;
           const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
           const fileId = crypto.randomUUID();
@@ -54,7 +72,6 @@ export default function HomePage() {
         if (data.textbooks) {
           const newBooks = data.textbooks as Textbook[];
           addTextbooks(newBooks);
-          // Cache TOC graphs BEFORE selectTextbook so graphs[id] is populated
           if (data.tocGraphs) {
             for (const [id, tg] of Object.entries(data.tocGraphs)) {
               setTOCGraph(id, tg as TOCGraph | null);
