@@ -23,6 +23,14 @@ export class MemoryStore implements Store {
   async setDrillGraph(textbookId: string, chapterId: string, data: KnowledgeGraph) {
     this.drillGraphs.set(`${textbookId}:${chapterId}`, data);
   }
+  async listDrillKeys(textbookId: string): Promise<string[]> {
+    const prefix = `${textbookId}:`;
+    const keys: string[] = [];
+    for (const key of this.drillGraphs.keys()) {
+      if (key.startsWith(prefix)) keys.push(key.slice(prefix.length));
+    }
+    return keys;
+  }
   async deleteDrillGraphs(textbookId: string) {
     const prefix = `${textbookId}:`;
     for (const key of this.drillGraphs.keys()) {

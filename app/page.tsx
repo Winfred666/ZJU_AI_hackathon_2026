@@ -21,18 +21,41 @@ export default function HomePage() {
   const handleUpload = useCallback(async (files: File[]) => {
     setLoading(true); setError(null);
     try {
-      const fd = new FormData();
-      files.forEach((f) => fd.append("files", f));
-      const res = await fetch("/api/parse", { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.error) { setError(data.error); return; }
-      if (data.textbooks) {
-        const newBooks = data.textbooks as Textbook[];
-        addTextbooks(newBooks);
-        if (newBooks[0] && !currentTextbookId) selectTextbook(newBooks[0].textbookId);
-        if (data.tocGraphs) {
-          for (const [id, tg] of Object.entries(data.tocGraphs)) {
-            setTOCGraph(id, tg as TOCGraph | null);
+      for (const file of files) {
+        let data: any;
+        if (file.size < 2 * 1024 * 1024) {
+          // Small file: direct upload
+          const fd = new FormData();
+          fd.append("files", file);
+          const res = await fetch("/api/parse", { method: "POST", body: fd });
+          data = await res.json();
+        } else {
+          // Large file: chunked upload (2MB chunks, stays under Vercel 4.5MB limit)
+          const CHUNK_SIZE = 2 * 1024 * 1024;
+          const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+          const fileId = crypto.randomUUID();
+          for (let i = 0; i < totalChunks; i++) {
+            const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+            const fd = new FormData();
+            fd.append("fileId", fileId);
+            fd.append("chunkIndex", String(i));
+            fd.append("totalChunks", String(totalChunks));
+            fd.append("filename", file.name);
+            fd.append("chunk", chunk);
+            const res = await fetch("/api/upload/chunk", { method: "POST", body: fd });
+            data = await res.json();
+            if (data.status === "complete") break;
+          }
+        }
+        if (data.error) { setError(data.error); return; }
+        if (data.textbooks) {
+          const newBooks = data.textbooks as Textbook[];
+          addTextbooks(newBooks);
+          if (newBooks[0] && !currentTextbookId) selectTextbook(newBooks[0].textbookId);
+          if (data.tocGraphs) {
+            for (const [id, tg] of Object.entries(data.tocGraphs)) {
+              setTOCGraph(id, tg as TOCGraph | null);
+            }
           }
         }
       }

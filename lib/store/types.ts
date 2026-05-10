@@ -13,6 +13,8 @@ export interface Store {
   getDrillGraph(textbookId: string, chapterId: string): Promise<KnowledgeGraph | null>;
   setDrillGraph(textbookId: string, chapterId: string, data: KnowledgeGraph): Promise<void>;
   deleteDrillGraphs(textbookId: string): Promise<void>;
+  /** List all drill sub-graph keys for a textbook (returns chapterIds) */
+  listDrillKeys(textbookId: string): Promise<string[]>;
 
   getPdfBuffer(textbookId: string): Promise<Buffer | null>;
   setPdfBuffer(textbookId: string, buffer: Buffer): Promise<void>;

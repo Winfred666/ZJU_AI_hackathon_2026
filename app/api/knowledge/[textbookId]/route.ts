@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStore } from "@/lib/store";
+import { KnowledgeGraph } from "@/types";
 
 export async function GET(
   _request: NextRequest,
@@ -11,5 +12,30 @@ export async function GET(
   if (!tocGraph) {
     return NextResponse.json({ error: "知识图谱未找到" }, { status: 404 });
   }
-  return NextResponse.json({ tocGraph });
+
+  // Merge TOC graph with all drill sub-graphs for persistence
+  const drillKeys = await store.listDrillKeys(textbookId);
+  const merged: KnowledgeGraph = {
+    nodes: [...tocGraph.nodes],
+    relations: [...tocGraph.relations],
+  };
+
+  for (const chapterId of drillKeys) {
+    const sub = await store.getDrillGraph(textbookId, chapterId);
+    if (!sub) continue;
+    const existingIds = new Set(merged.nodes.map((n) => n.id));
+    for (const n of sub.nodes) {
+      if (!existingIds.has(n.id)) {
+        merged.nodes.push(n);
+        existingIds.add(n.id);
+      }
+    }
+    for (const r of sub.relations) {
+      if (!merged.relations.some((er) => er.source === r.source && er.target === r.target)) {
+        merged.relations.push(r);
+      }
+    }
+  }
+
+  return NextResponse.json({ tocGraph: { ...tocGraph, nodes: merged.nodes, relations: merged.relations } });
 }

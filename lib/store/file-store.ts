@@ -73,6 +73,18 @@ export class FileStore implements Store {
   async setDrillGraph(textbookId: string, chapterId: string, data: KnowledgeGraph) {
     await writeJson(NS.drillGraph(textbookId, chapterId), data);
   }
+  async listDrillKeys(textbookId: string): Promise<string[]> {
+    await ensureDir();
+    const prefix = `drill%3A${textbookId}%3A`;
+    const entries = await fs.readdir(DATA_DIR);
+    return entries
+      .filter((e) => e.startsWith(prefix))
+      .map((e) => {
+        // drill%3A{textbookId}%3A{chapterId}.json → chapterId
+        const rest = decodeURIComponent(e.replace(/\.json$/, ""));
+        return rest.slice(`drill:${textbookId}:`.length);
+      });
+  }
   async deleteDrillGraphs(textbookId: string) {
     await ensureDir();
     const prefix = `drill%3A${textbookId}%3A`;
