@@ -37,15 +37,21 @@ test.describe("Full upload flow", () => {
       }
     });
 
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "networkidle" });
     await expect(page.getByText("暂无教材")).toBeVisible();
 
-    // Upload small PDF — falls into tiny-file branch (< 50KB)
-    // → full text parsed → TOC graph extracted from full content
-    await page.locator('input[type="file"]').setInputFiles(SMALL_PDF);
+    await page.screenshot({ path: "test-results/before-upload.png" }).catch(() => {});
 
-    // File appears with "full" parse status
-    await expect(page.getByText(/apple pear/i)).toBeVisible({ timeout: 15000 });
+    const fileInput = page.getByTestId("file-input");
+    await expect(fileInput).toBeAttached({ timeout: 5000 });
+
+    await fileInput.setInputFiles(SMALL_PDF);
+    // React synthetic event dispatch
+    await fileInput.dispatchEvent("input");
+    await fileInput.dispatchEvent("change");
+
+    // LLM TOC extraction takes ~5-15s — wait for file list to update
+    await expect(page.getByText(/apple pear/i)).toBeVisible({ timeout: 60000 });
 
     // Knowledge graph renders from full-file LLM extraction
     await expect(page.getByTestId("knowledge-graph")).toBeVisible({ timeout: 60000 });
@@ -70,18 +76,20 @@ test.describe("Full upload flow", () => {
       }
     });
 
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "networkidle" });
     await expect(page.getByText("暂无教材")).toBeVisible();
 
     // Upload big PDF (~32MB) — falls into TOC extraction branch
-    // → extract TOC pages → LLM builds graph from TOC text
-    await page.locator('input[type="file"]').setInputFiles(BIG_PDF);
+    const bigInput = page.getByTestId("file-input");
+    await bigInput.setInputFiles(BIG_PDF);
+    await bigInput.dispatchEvent("input");
+    await bigInput.dispatchEvent("change");
 
     // File appears with "toc_only" status (目录解析)
-    await expect(page.getByText(/生理/i)).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText(/生理/i)).toBeVisible({ timeout: 60000 });
 
     // Knowledge graph renders from TOC LLM extraction
-    await expect(page.getByTestId("knowledge-graph")).toBeVisible({ timeout: 120000 });
+    await expect(page.getByTestId("knowledge-graph")).toBeVisible({ timeout: 180000 });
 
     expect(realErrors).toHaveLength(0);
     await page.pause();

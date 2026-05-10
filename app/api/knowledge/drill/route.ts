@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { drillRequestSchema, drillOutputSchema } from "@/lib/validators";
 import { llmGenerate } from "@/lib/llm";
 import { KnowledgeGraph } from "@/types";
+import { pdfBufferStore } from "@/app/api/parse/route";
 
-const MAX_CONTENT_BYTES = 900_000; // ~900KB, under 1MB hard limit
+const MAX_CONTENT_BYTES = 900_000;
 
 const DRILL_SYSTEM = `你是一个学科知识提取专家。从教材章节正文中提取核心知识点及其包含关系。
 
@@ -29,40 +30,31 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { textbookId, chapterId, pageStart, pageEnd, chapterTitle } =
       drillRequestSchema.parse(body);
 
-    // Re-read PDF from the stored buffer? No — we don't store raw PDFs.
-    // Instead, parse route stored chapter content; drill re-uses it.
-    // But for page-level precision we need raw text. We use stored chapters.
-    const { textbookStore } = await import("@/app/api/parse/route");
-    const textbook = textbookStore.get(textbookId);
-    if (!textbook) {
-      return NextResponse.json({ error: "教材未找到" }, { status: 404 });
+    const buffer = pdfBufferStore.get(textbookId);
+    if (!buffer) {
+      return NextResponse.json({ error: "PDF 缓存已过期，请重新上传" }, { status: 404 });
     }
 
-    // Find the chapter's content from stored chapters
-    const chapter = textbook.chapters.find(
-      (c) => c.pageStart <= pageStart && c.pageEnd >= pageStart,
-    );
+    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const doc: any = await pdfjs.getDocument({ data: new Uint8Array(buffer) }).promise;
 
-    if (!chapter || !chapter.content) {
-      return NextResponse.json({ error: "章节内容未找到，请重新上传教材" }, { status: 404 });
+    const maxPage = Math.min(pageEnd, doc.numPages);
+    const pages: string[] = [];
+    for (let i = pageStart; i <= maxPage; i++) {
+      const page = await doc.getPage(i);
+      const content = await page.getTextContent();
+      pages.push(content.items.map((item: { str?: string }) => ("str" in item ? item.str : "")).join(" "));
     }
+    let content = pages.join("\n");
 
-    // 1MB guard: truncate if needed
-    let content = chapter.content;
-    const contentBytes = new TextEncoder().encode(content).length;
-    if (contentBytes > MAX_CONTENT_BYTES) {
-      // Truncate to ~900KB while keeping full sentences
+    // 1MB guard
+    if (new TextEncoder().encode(content).length > MAX_CONTENT_BYTES) {
       content = content.slice(0, Math.floor(MAX_CONTENT_BYTES * 0.5));
     }
 
     const prompt = `章节：${chapterTitle}（第${pageStart}-${pageEnd}页）\n正文：${content}`;
-
-    const raw = await llmGenerate({
-      system: DRILL_SYSTEM,
-      prompt,
-      temperature: 0.25,
-    });
-
+    const raw = await llmGenerate({ system: DRILL_SYSTEM, prompt, temperature: 0.25 });
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return NextResponse.json({ error: "LLM 返回格式异常" }, { status: 500 });
@@ -71,7 +63,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const parsed = JSON.parse(jsonMatch[0]);
     const validated = drillOutputSchema.parse(parsed);
 
-    // Prefix IDs
     const prefix = `${textbookId}_drill_${chapterId}_`;
     const nodes = validated.nodes.map((n) => ({
       ...n,

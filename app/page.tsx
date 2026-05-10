@@ -5,14 +5,14 @@ import { FileList } from "@/components/file-list";
 import { KnowledgeGraphView } from "@/components/knowledge-graph";
 import { RAGChat } from "@/components/rag-chat";
 import { useSessionStore } from "@/hooks/use-knowledge-graph";
-import { Textbook, KnowledgeGraph, TOCGraph, KnowledgeNode } from "@/types";
+import { Textbook, KnowledgeGraph, KnowledgeNode } from "@/types";
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const {
     textbooks, currentTextbookId, knowledgeGraph, ragReady, isLoading,
-    addTextbooks, selectTextbook, setTOCGraph, mergeSubGraph,
+    addTextbooks, selectTextbook, mergeSubGraph,
     setRagReady, setLoading, setError,
   } = useSessionStore();
 
@@ -25,20 +25,13 @@ export default function HomePage() {
       const data = await res.json();
       if (data.error) { setError(data.error); return; }
       if (data.textbooks) {
-        addTextbooks(data.textbooks as Textbook[]);
-        const first = data.textbooks[0];
-        if (first && !currentTextbookId) selectTextbook(first.textbookId);
-        // Auto-load TOC graph from parse response
-        // Store all returned TOC graphs per textbook
-        if (data.tocGraphs) {
-          for (const [id, tg] of Object.entries(data.tocGraphs)) {
-            setTOCGraph(id, tg as TOCGraph | null);
-          }
-        }
+        const newBooks = data.textbooks as Textbook[];
+        addTextbooks(newBooks);
+        if (newBooks[0] && !currentTextbookId) selectTextbook(newBooks[0].textbookId);
       }
     } catch { setError("上传失败"); }
     finally { setLoading(false); }
-  }, [addTextbooks, currentTextbookId, selectTextbook, setError, setLoading, setTOCGraph]);
+  }, [addTextbooks, currentTextbookId, selectTextbook, setError, setLoading]);
 
   const handleSelectTextbook = useCallback((id: string) => {
     selectTextbook(id);

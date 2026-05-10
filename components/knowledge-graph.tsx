@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { KnowledgeGraph as KG, KnowledgeNode } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // G6 v5.1.1 calls console.error internally during destroy() with
 // "[G6 …] The graph instance has been destroyed". This fires harmlessly
@@ -45,8 +48,15 @@ export function KnowledgeGraphView({
   onNodeDoubleClick?: (node: KnowledgeNode) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const graphRef = useRef<{ destroy: () => void } | null>(null);
+  const graphRef = useRef<any>(null);
   const tokenRef = useRef(0);
+
+  const handleResetView = useCallback(() => {
+    if (graphRef.current) {
+      graphRef.current.zoomTo(1, { duration: 500 });
+      graphRef.current.fitView({ duration: 500 });
+    }
+  }, []);
 
   useEffect(() => {
     if (!graph || !containerRef.current) return;
@@ -65,7 +75,6 @@ export function KnowledgeGraphView({
     import("@antv/g6").then((mod) => {
       if (token !== tokenRef.current) return;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const G6Graph = mod.Graph as any;
 
       const g = new G6Graph({
@@ -86,23 +95,27 @@ export function KnowledgeGraphView({
           })),
         },
         layout: {
-          type: "d3-force",
-          linkDistance: 150,
-          collide: 60,
-          manyBody: { strength: -400 },
+          type: "force",
+          linkDistance: 180,
+          nodeStrength: -2000,
+          edgeStrength: 0.1,
+          preventOverlap: true,
+          nodeSize: 40, // Larger virtual size for overlap prevention (node is 24)
+          velocityDecay: 0.3, 
+          alphaDecay: 0.05,
           animate: true,
         },
         node: {
           style: {
-            size: 48,
+            size: 24,
             fill: theme.nodeFill,
             stroke: theme.nodeFill,
             labelText: (d: { data?: { label?: string } }) => d.data?.label ?? "",
             labelPlacement: "bottom",
-            labelFontSize: 12,
+            labelFontSize: 10,
             labelFill: theme.nodeLabel,
             labelFontWeight: "500",
-            labelOffsetY: 8,
+            labelOffsetY: 4,
           },
           state: {
             active: { halo: true, haloFill: theme.nodeFill, haloOpacity: 0.15 },
@@ -113,10 +126,10 @@ export function KnowledgeGraphView({
           style: {
             stroke: theme.edgeStroke,
             endArrow: true,
-            lineWidth: 1.5,
+            lineWidth: 1,
             labelText: (d: { data?: { label?: string } }) => d.data?.label ?? "",
             labelFill: theme.edgeLabel,
-            labelFontSize: 10,
+            labelFontSize: 9,
             labelBackground: true,
             labelBackgroundFill: "#fff",
             labelBackgroundOpacity: 0.9,
@@ -127,7 +140,12 @@ export function KnowledgeGraphView({
         behaviors: [
           "zoom-canvas",
           "drag-canvas",
-          "drag-element",
+          {
+            type: "drag-element",
+            enableTransient: true,
+            // In G6 v5, the layout automatically reacts to node position changes 
+            // if configured correctly, but we can nudge it for more "conductivity"
+          },
           "hover-element",
           "click-element",
         ],
@@ -138,7 +156,7 @@ export function KnowledgeGraphView({
       graphRef.current = g;
 
       if (onNodeDoubleClick) {
-        g.on("node:dblclick", (evt: { target?: { id?: string } }) => {
+        g.on("node:dblclick", (evt: any) => {
           const nodeId = evt.target?.id;
           if (!nodeId) return;
           const node = graph.nodes.find((n) => n.id === nodeId);
@@ -155,7 +173,7 @@ export function KnowledgeGraphView({
         graphRef.current = null;
       }
     };
-  }, [graph]);
+  }, [graph, onNodeDoubleClick]);
 
   if (loading) return <Skeleton className="size-full" />;
   if (!graph || graph.nodes.length === 0) {
@@ -168,7 +186,19 @@ export function KnowledgeGraphView({
       </div>
     );
   }
+
   return (
-    <div ref={containerRef} className="size-full" data-testid="knowledge-graph" />
+    <div className="relative size-full overflow-hidden rounded-xl">
+      <div ref={containerRef} className="size-full" data-testid="knowledge-graph" />
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute bottom-4 right-4 z-10 size-8 rounded-full bg-background/80 shadow-sm backdrop-blur-sm hover:bg-background"
+        onClick={handleResetView}
+        title="重置视图"
+      >
+        <Home className="size-4" />
+      </Button>
+    </div>
   );
 }

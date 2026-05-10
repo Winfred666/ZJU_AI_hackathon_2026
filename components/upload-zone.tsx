@@ -54,6 +54,7 @@ export function UploadZone({ onUpload, disabled }: { onUpload: (files: File[]) =
       <input
         ref={inputRef}
         type="file"
+        data-testid="file-input"
         accept=".pdf,.txt,.md"
         multiple
         className="hidden"
