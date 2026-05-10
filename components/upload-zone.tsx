@@ -6,6 +6,21 @@ import { Card } from "@/components/ui/card";
 import { Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const ACCEPTED_EXTS = [".pdf", ".txt", ".md", ".docx", ".xlsx", ".xls"];
+
+const ACCEPTED_MIME_TYPES = [
+  "application/pdf",
+  "text/plain",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+];
+
+function isAcceptedFile(file: File): boolean {
+  if (ACCEPTED_MIME_TYPES.includes(file.type)) return true;
+  return ACCEPTED_EXTS.some((ext) => file.name.toLowerCase().endsWith(ext));
+}
+
 export function UploadZone({ onUpload, disabled }: { onUpload: (files: File[]) => void; disabled?: boolean }) {
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -13,8 +28,7 @@ export function UploadZone({ onUpload, disabled }: { onUpload: (files: File[]) =
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files).filter((f) =>
-      f.type === "application/pdf" || f.name.endsWith(".txt") || f.name.endsWith(".md"));
+    const files = Array.from(e.dataTransfer.files).filter(isAcceptedFile);
     if (files.length > 0) onUpload(files);
   }, [onUpload]);
 
@@ -39,7 +53,7 @@ export function UploadZone({ onUpload, disabled }: { onUpload: (files: File[]) =
       <input
         ref={inputRef}
         type="file"
-        accept=".pdf,.txt,.md"
+        accept={ACCEPTED_EXTS.join(",")}
         multiple
         className="hidden"
         onChange={(e) => {
@@ -63,7 +77,7 @@ export function UploadZone({ onUpload, disabled }: { onUpload: (files: File[]) =
           点击上传
         </Button>
       </p>
-      <p className="mt-1 text-xs text-muted-foreground">支持 PDF、TXT、MD</p>
+      <p className="mt-1 text-xs text-muted-foreground">支持 PDF、TXT、MD、Word (DOCX)、Excel (XLSX/XLS)</p>
     </Card>
   );
 }
