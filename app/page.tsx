@@ -51,12 +51,13 @@ export default function HomePage() {
         if (data.textbooks) {
           const newBooks = data.textbooks as Textbook[];
           addTextbooks(newBooks);
-          if (newBooks[0] && !currentTextbookId) selectTextbook(newBooks[0].textbookId);
+          // Cache TOC graphs BEFORE selectTextbook so graphs[id] is populated
           if (data.tocGraphs) {
             for (const [id, tg] of Object.entries(data.tocGraphs)) {
               setTOCGraph(id, tg as TOCGraph | null);
             }
           }
+          if (newBooks[0] && !currentTextbookId) selectTextbook(newBooks[0].textbookId);
         }
       }
     } catch { setError("上传失败"); }

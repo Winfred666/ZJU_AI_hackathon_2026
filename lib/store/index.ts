@@ -5,9 +5,9 @@ let _store: Store | null = null;
 export function getStore(): Store {
   if (_store) return _store;
 
-  let s: Store;
-  // Vercel serverless: filesystem is ephemeral — use MemoryStore
+  // Vercel serverless: filesystem is read-only, use MemoryStore
   // Local dev: use FileStore for persistence across restarts
+  let s: Store;
   if (process.env.VERCEL) {
     const { MemoryStore } = require("./memory-store");
     s = new MemoryStore();

@@ -1,4 +1,4 @@
-import { Textbook, TOCGraph } from "@/types";
+import { Textbook, TOCGraph, Chapter } from "@/types";
 import { parseTxtContent } from "@/lib/txt-parser";
 import { getTextbookTitle, estimatePages, extractChapters, extractTOC } from "@/lib/pdf-parser";
 import { extractTOCGraph } from "@/lib/toc-llm";
@@ -94,6 +94,44 @@ async function handlePdf(
   }
 }
 
+/** Fallback graph built from chapter headings when LLM extraction fails */
+function buildFallbackGraph(textbookId: string, chapters: Chapter[]): TOCGraph {
+  const MAX_NODES = 40;
+  const limitedChapters = chapters.slice(0, MAX_NODES);
+  const nodes = limitedChapters.map((ch, i) => ({
+    id: `${textbookId}_fb${String(i + 1).padStart(3, "0")}`,
+    name: ch.title,
+    definition: ch.content.slice(0, 200).replace(/\n/g, " "),
+    category: "核心概念" as const,
+    chapter: ch.title,
+    page: ch.pageStart,
+    textbookId,
+    isTocNode: true,
+    pageRange: { start: ch.pageStart, end: ch.pageEnd },
+  }));
+  const relations = [];
+  for (let i = 1; i < nodes.length; i++) {
+    relations.push({
+      source: nodes[i - 1].id,
+      target: nodes[i].id,
+      relationType: "prerequisite" as const,
+      description: `${nodes[i - 1].name} → ${nodes[i].name}`,
+    });
+  }
+  return {
+    nodes,
+    relations,
+    tocStructure: limitedChapters.map((ch, i) => ({
+      id: `${textbookId}_fb${String(i + 1).padStart(3, "0")}`,
+      name: ch.title,
+      pageStart: ch.pageStart,
+      pageEnd: ch.pageEnd,
+      parentId: null,
+      level: 1 as const,
+    })),
+  };
+}
+
 async function buildResult(
   store: ReturnType<typeof getStore>,
   textbookId: string, title: string, fileBytes: number, totalPages: number,
@@ -113,9 +151,24 @@ async function buildResult(
   const cpm = chapters.map((c) => ({ title: c.title, pageStart: c.pageStart, pageEnd: c.pageEnd }));
   const t0 = performance.now();
   const tg = await extractTOCGraph(llmInput, textbookId, cpm);
-  console.log(`[parse] ${title} — LLM ${((performance.now() - t0) / 1000).toFixed(1)}s, ${tg?.nodes.length ?? 0} nodes`);
-  if (tg) await store.setTOCGraph(textbookId, tg);
-  return { textbook: tb, tocGraph: tg };
+  const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
+  console.log(`[parse] ${title} — LLM ${elapsed}s, ${tg?.nodes.length ?? 0} nodes`);
+
+  if (tg) {
+    await store.setTOCGraph(textbookId, tg);
+    return { textbook: tb, tocGraph: tg };
+  }
+
+  // LLM failed — build fallback from chapter headings
+  if (chapters.length > 0) {
+    console.log(`[parse] ${title} — LLM returned null, using chapter fallback (${chapters.length} chapters)`);
+    const fallback = buildFallbackGraph(textbookId, chapters);
+    await store.setTOCGraph(textbookId, fallback);
+    return { textbook: tb, tocGraph: fallback };
+  }
+
+  console.log(`[parse] ${title} — no chapters, no TOC, returning empty graph`);
+  return { textbook: tb, tocGraph: null };
 }
 
 export function makeError(id: string, filename: string, msg: string): Textbook {

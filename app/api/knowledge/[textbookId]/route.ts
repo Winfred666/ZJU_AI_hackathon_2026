@@ -10,7 +10,7 @@ export async function GET(
   const store = getStore();
   const tocGraph = await store.getTOCGraph(textbookId);
   if (!tocGraph) {
-    return NextResponse.json({ error: "知识图谱未找到" }, { status: 404 });
+    return NextResponse.json({ tocGraph: null });
   }
 
   // Merge TOC graph with all drill sub-graphs for persistence

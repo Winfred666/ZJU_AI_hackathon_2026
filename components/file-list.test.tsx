@@ -48,13 +48,13 @@ const sampleTextbooks: Textbook[] = [
 
 describe("FileList", () => {
   it("shows empty state when no textbooks", () => {
-    render(<FileList textbooks={[]} selectedId={null} onSelect={vi.fn()} />);
+    render(<FileList textbooks={[]} selectedId={null} onSelect={vi.fn()} onDelete={vi.fn()} />);
     expect(screen.getByText("暂无教材")).toBeInTheDocument();
   });
 
   it("renders all textbooks", () => {
     render(
-      <FileList textbooks={sampleTextbooks} selectedId={null} onSelect={vi.fn()} />,
+      <FileList textbooks={sampleTextbooks} selectedId={null} onSelect={vi.fn()} onDelete={vi.fn()} />,
     );
     expect(screen.getByText("生理学")).toBeInTheDocument();
     expect(screen.getByText("医学免疫学")).toBeInTheDocument();
@@ -63,14 +63,14 @@ describe("FileList", () => {
 
   it("shows status detail text", () => {
     render(
-      <FileList textbooks={sampleTextbooks} selectedId={null} onSelect={vi.fn()} />,
+      <FileList textbooks={sampleTextbooks} selectedId={null} onSelect={vi.fn()} onDelete={vi.fn()} />,
     );
     expect(screen.getByText(/45KB/)).toBeInTheDocument();
   });
 
   it("highlights selected textbook", () => {
     const { container } = render(
-      <FileList textbooks={sampleTextbooks} selectedId="tb1" onSelect={vi.fn()} />,
+      <FileList textbooks={sampleTextbooks} selectedId="tb1" onSelect={vi.fn()} onDelete={vi.fn()} />,
     );
     const selected = container.querySelector(".ring-1");
     expect(selected).toBeTruthy();
@@ -79,7 +79,7 @@ describe("FileList", () => {
   it("calls onSelect when textbook clicked", () => {
     const onSelect = vi.fn();
     render(
-      <FileList textbooks={sampleTextbooks} selectedId={null} onSelect={onSelect} />,
+      <FileList textbooks={sampleTextbooks} selectedId={null} onSelect={onSelect} onDelete={vi.fn()} />,
     );
     screen.getByText("生理学").click();
     expect(onSelect).toHaveBeenCalledWith("tb1");
