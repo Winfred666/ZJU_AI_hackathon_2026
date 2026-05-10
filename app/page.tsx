@@ -126,7 +126,7 @@ export default function HomePage() {
             文献列表
           </div>
           <div className="flex-1 overflow-hidden">
-            <FileList textbooks={textbooks} selectedId={currentTextbookId} onSelect={handleSelectTextbook} onDelete={removeTextbook} />
+            <FileList textbooks={textbooks} selectedId={currentTextbookId} onSelect={handleSelectTextbook} />
           </div>
         </aside>
 

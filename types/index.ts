@@ -23,7 +23,7 @@ export interface ParseResult {
 }
 
 /** How much of the PDF was parsed */
-export type ParseStatus = "full" | "partial" | "toc_only" | "error";
+export type ParseStatus = "full" | "partial" | "toc_only" | "error" | "merged";
 
 export interface Textbook extends ParseResult {
   status: ParseStatus;
