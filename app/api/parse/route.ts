@@ -78,7 +78,8 @@ async function handlePdf(
   try {
     console.log(`[parse] ${title} (${(fileBytes / 1024).toFixed(0)}KB) — parsing PDF`);
 
-    const pdfParse = (await import("pdf-parse")).default;
+    const pdfParseMod = await import("pdf-parse");
+    const pdfParse = pdfParseMod.default ?? pdfParseMod;
     const data = await pdfParse(buffer);
     const fullText = data.text as string;
     const totalPages = data.numpages;

@@ -36,7 +36,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: "PDF 缓存已过期，请重新上传" }, { status: 404 });
     }
 
-    const pdfParse = (await import("pdf-parse")).default;
+    const pdfParseMod = await import("pdf-parse");
+    const pdfParse = pdfParseMod.default ?? pdfParseMod;
     const data = await pdfParse(buffer);
     const fullText = data.text as string;
     const totalPages = data.numpages;
